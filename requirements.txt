@@ -1,0 +1,15 @@
+# Versions verified in the project's Windows / Python 3.12 environment (2026-10-04).
+# CPU-only PyTorch: install torch/torchvision from the PyTorch CPU index first (see README).
+torch==2.14.1
+torchvision==0.29.1
+segmentation-models-pytorch==0.5.0
+timm==1.0.30
+building-footprint-segmentation==0.2.4
+rasterio==1.5.2
+geopandas==1.2.0
+shapely==2.1.2
+pyproj==3.8.0
+numpy==2.5.3
+pandas==3.0.6
+scipy==1.18.1
+pillow==12.3.0

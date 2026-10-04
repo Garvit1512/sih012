@@ -1,0 +1,548 @@
+{
+  "labels": "data\\validation_test\\reviewed_labels.geojson",
+  "n_labels": 30,
+  "n_ignore_regions": 24,
+  "label_confidence_counts": {
+    "high": 16,
+    "medium": 14
+  },
+  "eval_res_m": 0.1,
+  "match_iou_threshold": 0.5,
+  "min_piece_area_m2": 2.0,
+  "runs": {
+    "A_whu_baseline": {
+      "name": "A_whu_baseline",
+      "overall": {
+        "pixel_precision": 0.835173953583863,
+        "pixel_recall": 0.6452425169685875,
+        "pixel_iou": 0.5723573518117917,
+        "building_precision": 0.42857142857142855,
+        "building_recall": 0.2,
+        "tp": 97631,
+        "fp": 19268,
+        "fn": 53678,
+        "eval_px": 511769,
+        "matched": 6,
+        "n_pred": 14,
+        "n_label": 30,
+        "mean_matched_iou": 0.7068239044814204
+      },
+      "per_window": {
+        "T1_mixed_west": {
+          "pixel_precision": 0.8331017369727047,
+          "pixel_recall": 0.7013285427807486,
+          "pixel_iou": 0.6149309498516429,
+          "building_precision": 0.6,
+          "building_recall": 0.6,
+          "tp": 16787,
+          "fp": 3363,
+          "fn": 7149,
+          "eval_px": 138217,
+          "matched": 3,
+          "n_pred": 5,
+          "n_label": 5,
+          "mean_matched_iou": 0.7795402350152484
+        },
+        "T2_dense_south_centre": {
+          "pixel_precision": 0.7024271948837908,
+          "pixel_recall": 0.5892275288484041,
+          "pixel_iou": 0.471526327162717,
+          "building_precision": 0.2,
+          "building_recall": 0.06666666666666667,
+          "tp": 32731,
+          "fp": 13866,
+          "fn": 22818,
+          "eval_px": 118953,
+          "matched": 1,
+          "n_pred": 5,
+          "n_label": 15,
+          "mean_matched_iou": 0.566571290191169
+        },
+        "T3_residential_north": {
+          "pixel_precision": 0.9686237288135593,
+          "pixel_recall": 0.8914568098435122,
+          "pixel_iou": 0.8664370269745779,
+          "building_precision": 1.0,
+          "building_recall": 1.0,
+          "tp": 35718,
+          "fp": 1157,
+          "fn": 4349,
+          "eval_px": 154569,
+          "matched": 1,
+          "n_pred": 1,
+          "n_label": 1,
+          "mean_matched_iou": 0.8174504413331066
+        },
+        "T4_dense_south_west": {
+          "pixel_precision": 0.9335693304210289,
+          "pixel_recall": 0.3903076487073716,
+          "pixel_iou": 0.37976040932626615,
+          "building_precision": 0.3333333333333333,
+          "building_recall": 0.1111111111111111,
+          "tp": 12395,
+          "fp": 882,
+          "fn": 19362,
+          "eval_px": 100030,
+          "matched": 1,
+          "n_pred": 3,
+          "n_label": 9,
+          "mean_matched_iou": 0.5183009903185016
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "model": "whu-unetplusplus-efficientnet-b4",
+        "weights": "E:\\sih012\\models\\whu\\model.pth",
+        "hf_repo": "giswqs/whu-building-unetplusplus-efficientnet-b4",
+        "hf_revision": "09df9efd323bbd3d56b98b4857129eb9b5baa2d3",
+        "smp_version": "0.5.0",
+        "torch_version": "2.14.1+cpu",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.30000000000000004,
+        "inference_shape": [
+          1180,
+          1040
+        ],
+        "norm": "divide_by_255",
+        "window": 512,
+        "overlap": 128,
+        "threshold": 0.5,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.15000000000000002,
+        "feature_count": 74,
+        "building_fraction_of_valid": 0.19910044479002278,
+        "inference_s": 7.0,
+        "runtime_s": 8.3
+      }
+    },
+    "B_approved_postproc": {
+      "name": "B_approved_postproc",
+      "overall": {
+        "pixel_precision": 0.8400537149861206,
+        "pixel_recall": 0.6160175534832694,
+        "pixel_iou": 0.5513498485708878,
+        "building_precision": 0.42105263157894735,
+        "building_recall": 0.26666666666666666,
+        "tp": 93209,
+        "fp": 17747,
+        "fn": 58100,
+        "eval_px": 511769,
+        "matched": 8,
+        "n_pred": 19,
+        "n_label": 30,
+        "mean_matched_iou": 0.7277186273820873
+      },
+      "per_window": {
+        "T1_mixed_west": {
+          "pixel_precision": 0.8331844351796704,
+          "pixel_recall": 0.7013285427807486,
+          "pixel_iou": 0.61497600468916,
+          "building_precision": 0.5,
+          "building_recall": 0.6,
+          "tp": 16787,
+          "fp": 3361,
+          "fn": 7149,
+          "eval_px": 138217,
+          "matched": 3,
+          "n_pred": 6,
+          "n_label": 5,
+          "mean_matched_iou": 0.7795402350152484
+        },
+        "T2_dense_south_centre": {
+          "pixel_precision": 0.6966576596314419,
+          "pixel_recall": 0.5151847918054331,
+          "pixel_iou": 0.420791060138215,
+          "building_precision": 0.25,
+          "building_recall": 0.13333333333333333,
+          "tp": 28618,
+          "fp": 12461,
+          "fn": 26931,
+          "eval_px": 118953,
+          "matched": 2,
+          "n_pred": 8,
+          "n_label": 15,
+          "mean_matched_iou": 0.6357656620317726
+        },
+        "T3_residential_north": {
+          "pixel_precision": 0.9686237288135593,
+          "pixel_recall": 0.8914568098435122,
+          "pixel_iou": 0.8664370269745779,
+          "building_precision": 1.0,
+          "building_recall": 1.0,
+          "tp": 35718,
+          "fp": 1157,
+          "fn": 4349,
+          "eval_px": 154569,
+          "matched": 1,
+          "n_pred": 1,
+          "n_label": 1,
+          "mean_matched_iou": 0.8174504413331066
+        },
+        "T4_dense_south_west": {
+          "pixel_precision": 0.9402520616150615,
+          "pixel_recall": 0.38057751047013255,
+          "pixel_iou": 0.37159108378170636,
+          "building_precision": 0.5,
+          "building_recall": 0.2222222222222222,
+          "tp": 12086,
+          "fp": 768,
+          "fn": 19671,
+          "eval_px": 100030,
+          "matched": 2,
+          "n_pred": 4,
+          "n_label": 9,
+          "mean_matched_iou": 0.6970732743071504
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.30000000000000004,
+        "threshold": 0.5,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.15000000000000002,
+        "model": "whu-unetplusplus-efficientnet-b4",
+        "hf_revision": "09df9efd323bbd3d56b98b4857129eb9b5baa2d3",
+        "postprocess": "rgb_guided_v1 cuts filtered by human review (accepted only)",
+        "inputs_sha256": {
+          "rgb_instances": "26259a006212aa5d8725b3fc6879b0124a4bf61c98fd1deb5a8ca5838836aab7",
+          "baseline_mask": "c44aa98e52525ae16470c1ce1ceca7177e54a4c818926de1f0c13ac073edc915",
+          "review_file": "d1420758d2e6b2ec7f24152a2dac6bd8631664a0bd74c92a1b2f57ecc9170022"
+        },
+        "cuts": {
+          "accepted": 30,
+          "rejected": 20,
+          "uncertain": 12
+        },
+        "cuts_applied": 30,
+        "instances": 151,
+        "feature_count": 102,
+        "baseline_feature_count": 74,
+        "building_pixels": 155685
+      }
+    },
+    "C_maskrcnn_0.3m": {
+      "name": "C_maskrcnn_0.3m",
+      "overall": {
+        "pixel_precision": 0.9579614006188367,
+        "pixel_recall": 0.5688293492125386,
+        "pixel_iou": 0.554975948828392,
+        "building_precision": 0.631578947368421,
+        "building_recall": 0.4,
+        "tp": 86069,
+        "fp": 3777,
+        "fn": 65240,
+        "eval_px": 511769,
+        "matched": 12,
+        "n_pred": 19,
+        "n_label": 30,
+        "mean_matched_iou": 0.8089440711077877
+      },
+      "per_window": {
+        "T1_mixed_west": {
+          "pixel_precision": 0.9766104294478528,
+          "pixel_recall": 0.7448612967914439,
+          "pixel_iou": 0.7318064277798301,
+          "building_precision": 0.6,
+          "building_recall": 0.6,
+          "tp": 17829,
+          "fp": 427,
+          "fn": 6107,
+          "eval_px": 138217,
+          "matched": 3,
+          "n_pred": 5,
+          "n_label": 5,
+          "mean_matched_iou": 0.8322546019610552
+        },
+        "T2_dense_south_centre": {
+          "pixel_precision": 0.9311104218362283,
+          "pixel_recall": 0.5404057678806099,
+          "pixel_iou": 0.5196295655184352,
+          "building_precision": 0.8333333333333334,
+          "building_recall": 0.3333333333333333,
+          "tp": 30019,
+          "fp": 2221,
+          "fn": 25530,
+          "eval_px": 118953,
+          "matched": 5,
+          "n_pred": 6,
+          "n_label": 15,
+          "mean_matched_iou": 0.8128275963869062
+        },
+        "T3_residential_north": {
+          "pixel_precision": 0.9987253380625138,
+          "pixel_recall": 0.4497716325155365,
+          "pixel_iou": 0.4495135944125717,
+          "building_precision": 0.0,
+          "building_recall": 0.0,
+          "tp": 18021,
+          "fp": 23,
+          "fn": 22046,
+          "eval_px": 154569,
+          "matched": 0,
+          "n_pred": 2,
+          "n_label": 1,
+          "mean_matched_iou": null
+        },
+        "T4_dense_south_west": {
+          "pixel_precision": 0.9480897399793485,
+          "pixel_recall": 0.6360802342790566,
+          "pixel_iou": 0.6146730365456593,
+          "building_precision": 0.6666666666666666,
+          "building_recall": 0.4444444444444444,
+          "tp": 20200,
+          "fp": 1106,
+          "fn": 11557,
+          "eval_px": 100030,
+          "matched": 4,
+          "n_pred": 6,
+          "n_label": 9,
+          "mean_matched_iou": 0.7866067663689386
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "model": "geoai maskrcnn_resnet50_fpn building_footprints_usa",
+        "weights": "E:\\sih012\\models\\maskrcnn_geoai\\building_footprints_usa.pth",
+        "weights_sha256": "3aea5d0da7803be31ff4e2e1e5ac747f15cab2a13d6bb1a9319b6a6ba8bc7bca",
+        "hf_repo": "giswqs/geoai",
+        "hf_revision": "aa2b25d27b2c78f0e92c7b6a4813a571f9bc2288",
+        "torch_version": "2.14.1+cpu",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.30000000000000004,
+        "inference_shape": [
+          1180,
+          1040
+        ],
+        "tile": 512,
+        "overlap": 128,
+        "score_threshold": 0.5,
+        "mask_threshold": 0.5,
+        "threshold": 0.5,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.15000000000000002,
+        "feature_count": 125,
+        "instances": 174,
+        "inference_s": 20.3,
+        "runtime_s": 22.0,
+        "protocol": "outputs/phase3/PROTOCOL.md \u00a74 (candidate C)"
+      }
+    },
+    "D_hybrid": {
+      "name": "D_hybrid",
+      "overall": {
+        "pixel_precision": 0.8744801137898129,
+        "pixel_recall": 0.6419908928087555,
+        "pixel_iou": 0.5878234454045942,
+        "building_precision": 0.3684210526315789,
+        "building_recall": 0.23333333333333334,
+        "tp": 97139,
+        "fp": 13943,
+        "fn": 54170,
+        "eval_px": 511769,
+        "matched": 7,
+        "n_pred": 19,
+        "n_label": 30,
+        "mean_matched_iou": 0.6883717018205656
+      },
+      "per_window": {
+        "T1_mixed_west": {
+          "pixel_precision": 0.8331017369727047,
+          "pixel_recall": 0.7013285427807486,
+          "pixel_iou": 0.6149309498516429,
+          "building_precision": 0.6,
+          "building_recall": 0.6,
+          "tp": 16787,
+          "fp": 3363,
+          "fn": 7149,
+          "eval_px": 138217,
+          "matched": 3,
+          "n_pred": 5,
+          "n_label": 5,
+          "mean_matched_iou": 0.7795402350152484
+        },
+        "T2_dense_south_centre": {
+          "pixel_precision": 0.7906155769655071,
+          "pixel_recall": 0.5805685070838359,
+          "pixel_iou": 0.5031986269308785,
+          "building_precision": 0.375,
+          "building_recall": 0.2,
+          "tp": 32250,
+          "fp": 8541,
+          "fn": 23299,
+          "eval_px": 118953,
+          "matched": 3,
+          "n_pred": 8,
+          "n_label": 15,
+          "mean_matched_iou": 0.6527202451592979
+        },
+        "T3_residential_north": {
+          "pixel_precision": 0.9686211759600781,
+          "pixel_recall": 0.8913819352584421,
+          "pixel_iou": 0.8663642538327188,
+          "building_precision": 0.0,
+          "building_recall": 0.0,
+          "tp": 35715,
+          "fp": 1157,
+          "fn": 4352,
+          "eval_px": 154569,
+          "matched": 0,
+          "n_pred": 2,
+          "n_label": 1,
+          "mean_matched_iou": null
+        },
+        "T4_dense_south_west": {
+          "pixel_precision": 0.9335292787700655,
+          "pixel_recall": 0.3900557357433007,
+          "pixel_iou": 0.3795153037776893,
+          "building_precision": 0.25,
+          "building_recall": 0.1111111111111111,
+          "tp": 12387,
+          "fp": 882,
+          "fn": 19370,
+          "eval_px": 100030,
+          "matched": 1,
+          "n_pred": 4,
+          "n_label": 9,
+          "mean_matched_iou": 0.521820472220321
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.30000000000000004,
+        "threshold": 0.5,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.15000000000000002,
+        "method": "D: WHU mask partitioned by Mask R-CNN instances (PROTOCOL.md amendment 1)",
+        "whu_dir": "outputs\\lapaz_predio_bisa_whu_0.3m",
+        "instance_dir": "outputs\\phase3\\maskrcnn_0.3m",
+        "min_seed_m2": 10.0,
+        "whu_components": 123,
+        "instances": 166,
+        "feature_count": 117,
+        "baseline_feature_count": 74
+      }
+    }
+  },
+  "secondary_reference_not_ground_truth": {
+    "name": "microsoft_ml_footprints",
+    "overall": {
+      "pixel_precision": 0.5677827516146616,
+      "pixel_recall": 0.45434177742236087,
+      "pixel_iou": 0.33758427821509424,
+      "building_precision": 0.0,
+      "building_recall": 0.0,
+      "tp": 68746,
+      "fp": 52332,
+      "fn": 82563,
+      "eval_px": 511769,
+      "matched": 0,
+      "n_pred": 21,
+      "n_label": 30,
+      "mean_matched_iou": null
+    },
+    "per_window": {
+      "T1_mixed_west": {
+        "pixel_precision": 0.8040571692023974,
+        "pixel_recall": 0.07286096256684492,
+        "pixel_iou": 0.07158983621362013,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 1744,
+        "fp": 425,
+        "fn": 22192,
+        "eval_px": 138217,
+        "matched": 0,
+        "n_pred": 1,
+        "n_label": 5,
+        "mean_matched_iou": null
+      },
+      "T2_dense_south_centre": {
+        "pixel_precision": 0.4545154796612523,
+        "pixel_recall": 0.47149363624907736,
+        "pixel_iou": 0.30110827527534434,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 26191,
+        "fp": 31433,
+        "fn": 29358,
+        "eval_px": 118953,
+        "matched": 0,
+        "n_pred": 12,
+        "n_label": 15,
+        "mean_matched_iou": null
+      },
+      "T3_residential_north": {
+        "pixel_precision": 0.7295518558799744,
+        "pixel_recall": 0.6529313400054908,
+        "pixel_iou": 0.5256907465085904,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 26161,
+        "fp": 9698,
+        "fn": 13906,
+        "eval_px": 154569,
+        "matched": 0,
+        "n_pred": 3,
+        "n_label": 1,
+        "mean_matched_iou": null
+      },
+      "T4_dense_south_west": {
+        "pixel_precision": 0.5761818610870763,
+        "pixel_recall": 0.46131561545486033,
+        "pixel_iou": 0.3444384360379,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 14650,
+        "fp": 10776,
+        "fn": 17107,
+        "eval_px": 100030,
+        "matched": 0,
+        "n_pred": 5,
+        "n_label": 9,
+        "mean_matched_iou": null
+      }
+    }
+  }
+}

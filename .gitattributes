@@ -1,0 +1,4 @@
+# Store and check out every file byte-for-byte: frozen evaluation artifacts and
+# scripts are verified by SHA-256 (outputs/phase3/frozen_hashes.sha256), so no
+# line-ending conversion may be applied.
+* -text

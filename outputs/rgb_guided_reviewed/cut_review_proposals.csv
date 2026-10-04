@@ -1,0 +1,63 @@
+cut_id,proposed_status,reason
+C001,rejected,follows roof planes/ridge inside one continuous tile roof (large terracotta house)
+C002,rejected,separates roof terrace from the same house
+C003,rejected,separates roof terrace from the same house
+C004,rejected,follows roof ridge / shaded roof plane inside one roof
+C005,rejected,separates porch/terrace of the same house
+C006,rejected,cuts around glass courtyard roof and along tree occlusion of the same house
+C007,rejected,separates glass connector between two wings of the same house
+C008,rejected,follows tree occlusion edge on a continuous roof
+C009,accepted,straight visible edge between pink roof and separate white roof
+C010,uncertain,orange tile house vs light-grey roof; could be an attached annex of the same house
+C011,accepted,small red curved roof vs large grey shed; distinct roof with visible edge
+C012,uncertain,view too coarse to confirm the 44 m2 part is a separate roof
+C013,rejected,isolates middle segment of a continuous rusty roof row (vertical ends cut through the roof)
+C014,uncertain,rusty roof joined to grey shed complex; view too coarse to confirm wall
+C015,uncertain,grey patch enclosed by rusty roofs on three sides; separate roof or re-roofed patch
+C016,accepted,rotated cream roof joined at narrow junction; clearly separate building
+C017,accepted,flat grey concrete roof vs rusty corrugated strip roof; distinct structures
+C018,accepted,rusty strip roof vs teal roof; visible edge
+C019,accepted,white sheet roof vs rusty roof; cut approximately follows visible edge
+C020,accepted,grey roof vs red roof; visible edge
+C021,accepted,separate orange tile house vs other structures at narrow junction
+C022,uncertain,top follows rust/white edge but bottom wanders through cluttered patched roofing
+C023,accepted,orange tile vs grey metal roof; straight visible edge
+C024,rejected,bends through the continuous orange roof
+C025,accepted,purple roof vs different salmon roof; visible edge
+C026,rejected,splits the mauve roof of one building vertically
+C027,uncertain,thin strip at top of pink shed: separate salmon strip roof or sliver of pink roof
+C028,rejected,jagged cut through the pink shed roof
+C029,accepted,pink shed vs grey shed boundary (with C028 rejected the fragment rejoins the pink shed)
+C030,accepted,long cut mostly following pink/rusty vs grey shed boundary
+C031,rejected,loops around rooftop structure on the orange tile roof
+C032,accepted,grey roof vs pink roof; straight edge
+C033,rejected,jagged cut through dense clutter; no visible boundary
+C034,accepted,brown roof vs red roof; straight edge
+C035,accepted,red roof vs neighbouring building rooftop terrace
+C036,rejected,separates rooftop structure from roof of the same cyan building
+C037,uncertain,flat white roof vs pitched purple roof with long shared edge; could be one house
+C038,rejected,splits part of the same brown roof along a tree edge
+C039,uncertain,white-sheet block inside rusty roof complex; separate roof or re-roofed sheets
+C040,accepted,rusty roof vs grey roof; clear edge
+C041,accepted,follows real west edge of long grey roof (detached part is yard clutter / WHU false positive)
+C042,uncertain,small structure at shed edge; unclear at this scale
+C043,accepted,follows rusty roof edge (detached part is stacked timber / WHU false positive)
+C044,accepted,rusty roof west edge vs concrete courtyard (false positive)
+C045,accepted,small white roof vs lumber yard
+C046,accepted,small white roof vs rusty roof complex at short junction
+C047,rejected,runs through lumber and dirt; no building boundary
+C048,accepted,rusty roof east edge vs lumber yard
+C049,accepted,grey roof north edge
+C050,uncertain,curved cut between big grey roof and small cluttered roof; boundary unclear
+C051,accepted,pink roof top edge vs different roof
+C052,accepted,orange roof vs grey roof below
+C053,accepted,purple roof edge vs grey roof chain
+C054,rejected,loops through bottom of purple and rusty roofs
+C055,accepted,orange roof top edge vs mauve/rusty roofs
+C056,accepted,straight edge between orange roof and rusty roof beside it
+C057,uncertain,grey roof vs brick-coloured terrace area; may be the same building
+C058,uncertain,narrow rusty strip beside grey roof; possibly an attached lean-to
+C059,accepted,pink roof vs rusty roof; straight edge
+C060,rejected,jagged cut through patterned roofs and a terrace
+C061,rejected,cut sits inside the grey roof above the actual grey/green roof edge
+C062,accepted,follows pink roof lower edge vs grey roof

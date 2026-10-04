@@ -1,0 +1,60 @@
+{
+  "crs": "EPSG:32719",
+  "size_m": 40,
+  "split": "held-out test (phase 3)",
+  "selection": "2026-10-04 by land-use type from the raw orthophoto (no predictions shown); >=10 m from all W1-W4 and V1-V4 windows; see outputs/phase3/PROTOCOL.md",
+  "windows": [
+    {
+      "id": "T1_mixed_west",
+      "bounds": [
+        600727.81,
+        8171141.55,
+        600767.81,
+        8171181.55
+      ],
+      "top_left_offset_m": [
+        55,
+        238
+      ]
+    },
+    {
+      "id": "T2_dense_south_centre",
+      "bounds": [
+        600852.81,
+        8171106.55,
+        600892.81,
+        8171146.55
+      ],
+      "top_left_offset_m": [
+        180,
+        273
+      ]
+    },
+    {
+      "id": "T3_residential_north",
+      "bounds": [
+        600837.81,
+        8171334.55,
+        600877.81,
+        8171374.55
+      ],
+      "top_left_offset_m": [
+        165,
+        45
+      ]
+    },
+    {
+      "id": "T4_dense_south_west",
+      "bounds": [
+        600750.81,
+        8171099.55,
+        600790.81,
+        8171139.55
+      ],
+      "top_left_offset_m": [
+        78,
+        280
+      ]
+    }
+  ]
+}

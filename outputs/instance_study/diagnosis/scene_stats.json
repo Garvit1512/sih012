@@ -1,0 +1,17 @@
+{
+  "components": 123,
+  "components_below_min_area": 49,
+  "area_below_min_area_m2": 135.7,
+  "area_total_m2": 14011.7,
+  "below_min_area_size_quartiles_m2": [
+    0.45,
+    1.53,
+    4.32
+  ],
+  "below_min_area_mean_prob_median": 0.587,
+  "inference_res_m": 0.30000000000000004,
+  "threshold": 0.5,
+  "min_area_m2": 10.0,
+  "tile_px": 512,
+  "tile_overlap_px": 128
+}

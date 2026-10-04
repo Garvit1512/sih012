@@ -1,0 +1,9 @@
+{
+  "encoder_name": "efficientnet-b4",
+  "architecture": "unetplusplus",
+  "num_channels": 3,
+  "num_classes": 2,
+  "use_timm_model": false,
+  "timm_model_name": null,
+  "model_type": "timm_segmentation"
+}

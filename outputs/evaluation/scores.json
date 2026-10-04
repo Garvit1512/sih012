@@ -1,0 +1,316 @@
+{
+  "labels": "data\\validation\\reviewed_labels.geojson",
+  "n_labels": 32,
+  "n_ignore_regions": 6,
+  "label_confidence_counts": {
+    "high": 22,
+    "medium": 10
+  },
+  "eval_res_m": 0.1,
+  "match_iou_threshold": 0.5,
+  "min_piece_area_m2": 2.0,
+  "runs": {
+    "dlinknet": {
+      "name": "dlinknet",
+      "overall": {
+        "pixel_precision": 0.9663007403625223,
+        "pixel_recall": 0.027657615526261947,
+        "pixel_iou": 0.027630964200198564,
+        "building_precision": 1.0,
+        "building_recall": 0.03125,
+        "tp": 7570,
+        "fp": 264,
+        "fn": 266134,
+        "eval_px": 623864,
+        "matched": 1,
+        "n_pred": 1,
+        "n_label": 32,
+        "mean_matched_iou": 0.8089341960813093
+      },
+      "per_window": {
+        "W1_dense_informal": {
+          "pixel_precision": 0.9663007403625223,
+          "pixel_recall": 0.10797164496298726,
+          "pixel_iou": 0.10756660746003552,
+          "building_precision": 1.0,
+          "building_recall": 0.0625,
+          "tp": 7570,
+          "fp": 264,
+          "fn": 62541,
+          "eval_px": 149450,
+          "matched": 1,
+          "n_pred": 1,
+          "n_label": 16,
+          "mean_matched_iou": 0.8089341960813093
+        },
+        "W2_formal_residential": {
+          "pixel_precision": null,
+          "pixel_recall": 0.0,
+          "pixel_iou": 0.0,
+          "building_precision": null,
+          "building_recall": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 41419,
+          "eval_px": 154414,
+          "matched": 0,
+          "n_pred": 0,
+          "n_label": 3,
+          "mean_matched_iou": null
+        },
+        "W3_large_sheds": {
+          "pixel_precision": null,
+          "pixel_recall": 0.0,
+          "pixel_iou": 0.0,
+          "building_precision": null,
+          "building_recall": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 132222,
+          "eval_px": 160000,
+          "matched": 0,
+          "n_pred": 0,
+          "n_label": 11,
+          "mean_matched_iou": null
+        },
+        "W4_vegetation": {
+          "pixel_precision": null,
+          "pixel_recall": 0.0,
+          "pixel_iou": 0.0,
+          "building_precision": null,
+          "building_recall": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 29952,
+          "eval_px": 160000,
+          "matched": 0,
+          "n_pred": 0,
+          "n_label": 2,
+          "mean_matched_iou": null
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "weights": "E:\\sih012\\models\\best.pt",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.4,
+        "inference_shape": [
+          885,
+          780
+        ],
+        "norm": "min_max_image_net",
+        "threshold": 0.4,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.2,
+        "feature_count": 6,
+        "building_fraction_of_valid": 0.0373372378810856,
+        "runtime_s": 3.3
+      }
+    },
+    "whu": {
+      "name": "whu",
+      "overall": {
+        "pixel_precision": 0.9704784355835941,
+        "pixel_recall": 0.8453073393154649,
+        "pixel_iou": 0.8241160923552585,
+        "building_precision": 0.5833333333333334,
+        "building_recall": 0.21875,
+        "tp": 231364,
+        "fp": 7038,
+        "fn": 42340,
+        "eval_px": 623864,
+        "matched": 7,
+        "n_pred": 12,
+        "n_label": 32,
+        "mean_matched_iou": 0.7485811388493844
+      },
+      "per_window": {
+        "W1_dense_informal": {
+          "pixel_precision": 0.9363059503651633,
+          "pixel_recall": 0.7808047239377558,
+          "pixel_iou": 0.7414234441660459,
+          "building_precision": 0.3333333333333333,
+          "building_recall": 0.125,
+          "tp": 54743,
+          "fp": 3724,
+          "fn": 15368,
+          "eval_px": 149450,
+          "matched": 2,
+          "n_pred": 6,
+          "n_label": 16,
+          "mean_matched_iou": 0.6076690435025273
+        },
+        "W2_formal_residential": {
+          "pixel_precision": 0.9648508430609598,
+          "pixel_recall": 0.898017817909655,
+          "pixel_iou": 0.8695702997147801,
+          "building_precision": 1.0,
+          "building_recall": 0.6666666666666666,
+          "tp": 37195,
+          "fp": 1355,
+          "fn": 4224,
+          "eval_px": 154414,
+          "matched": 2,
+          "n_pred": 2,
+          "n_label": 3,
+          "mean_matched_iou": 0.8645507438015418
+        },
+        "W3_large_sheds": {
+          "pixel_precision": 0.9906373528758605,
+          "pixel_recall": 0.8434375519958857,
+          "pixel_iou": 0.8367673099432756,
+          "building_precision": 0.5,
+          "building_recall": 0.09090909090909091,
+          "tp": 111521,
+          "fp": 1054,
+          "fn": 20701,
+          "eval_px": 160000,
+          "matched": 1,
+          "n_pred": 2,
+          "n_label": 11,
+          "mean_matched_iou": 0.5875656579803724
+        },
+        "W4_vegetation": {
+          "pixel_precision": 0.9685872960777507,
+          "pixel_recall": 0.9316573183760684,
+          "pixel_iou": 0.9043328904300483,
+          "building_precision": 1.0,
+          "building_recall": 1.0,
+          "tp": 27905,
+          "fp": 905,
+          "fn": 2047,
+          "eval_px": 160000,
+          "matched": 2,
+          "n_pred": 2,
+          "n_label": 2,
+          "mean_matched_iou": 0.8540313696785901
+        }
+      },
+      "run_summary": {
+        "image": "data\\lapaz_predio_bisa.tif",
+        "model": "whu-unetplusplus-efficientnet-b4",
+        "weights": "E:\\sih012\\models\\whu\\model.pth",
+        "hf_repo": "giswqs/whu-building-unetplusplus-efficientnet-b4",
+        "hf_revision": "09df9efd323bbd3d56b98b4857129eb9b5baa2d3",
+        "smp_version": "0.5.0",
+        "torch_version": "2.14.1+cpu",
+        "crs": "EPSG:32719",
+        "source_bounds": [
+          600672.8055400001,
+          8171065.547730001,
+          600984.8055400001,
+          8171419.547730001
+        ],
+        "native_res_m": [
+          0.05,
+          0.05
+        ],
+        "inference_res_m": 0.30000000000000004,
+        "inference_shape": [
+          1180,
+          1040
+        ],
+        "norm": "divide_by_255",
+        "window": 512,
+        "overlap": 128,
+        "threshold": 0.5,
+        "min_area_m2": 10.0,
+        "simplify_m": 0.15000000000000002,
+        "feature_count": 74,
+        "building_fraction_of_valid": 0.19910044479002278,
+        "inference_s": 7.0,
+        "runtime_s": 8.3
+      }
+    }
+  },
+  "secondary_reference_not_ground_truth": {
+    "name": "microsoft_ml_footprints",
+    "overall": {
+      "pixel_precision": 0.6591586893582639,
+      "pixel_recall": 0.6080619939788969,
+      "pixel_iou": 0.46260861347223997,
+      "building_precision": 0.0,
+      "building_recall": 0.0,
+      "tp": 166429,
+      "fp": 86058,
+      "fn": 107275,
+      "eval_px": 623864,
+      "matched": 0,
+      "n_pred": 24,
+      "n_label": 32,
+      "mean_matched_iou": null
+    },
+    "per_window": {
+      "W1_dense_informal": {
+        "pixel_precision": 0.45254038561750914,
+        "pixel_recall": 0.49545720357718476,
+        "pixel_iou": 0.30978115468992456,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 34737,
+        "fp": 42023,
+        "fn": 35374,
+        "eval_px": 149450,
+        "matched": 0,
+        "n_pred": 12,
+        "n_label": 16,
+        "mean_matched_iou": null
+      },
+      "W2_formal_residential": {
+        "pixel_precision": 0.501841312353532,
+        "pixel_recall": 0.4342934402085999,
+        "pixel_iou": 0.3034668916069169,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 17988,
+        "fp": 17856,
+        "fn": 23431,
+        "eval_px": 154414,
+        "matched": 0,
+        "n_pred": 4,
+        "n_label": 3,
+        "mean_matched_iou": null
+      },
+      "W3_large_sheds": {
+        "pixel_precision": 0.9038283851397291,
+        "pixel_recall": 0.7842038389980487,
+        "pixel_iou": 0.7238071969564762,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 103689,
+        "fp": 11033,
+        "fn": 28533,
+        "eval_px": 160000,
+        "matched": 0,
+        "n_pred": 6,
+        "n_label": 11,
+        "mean_matched_iou": null
+      },
+      "W4_vegetation": {
+        "pixel_precision": 0.3980366440125591,
+        "pixel_recall": 0.33436832264957267,
+        "pixel_iou": 0.22207193223646282,
+        "building_precision": 0.0,
+        "building_recall": 0.0,
+        "tp": 10015,
+        "fp": 15146,
+        "fn": 19937,
+        "eval_px": 160000,
+        "matched": 0,
+        "n_pred": 2,
+        "n_label": 2,
+        "mean_matched_iou": null
+      }
+    }
+  }
+}

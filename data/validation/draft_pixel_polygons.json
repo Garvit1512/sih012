@@ -1,0 +1,57 @@
+{
+  "_README": "PROVISIONAL, UNREVIEWED draft building-footprint annotations. Vertices are (col,row) pixel coordinates in each 800x800 native-resolution (0.05 m) window crop defined in windows.json, origin = window top-left. Traced visually by an AI assistant (Claude) from the raw orthophoto crops with a 2.5 m grid; no model prediction layer was shown while tracing. Outlines are roof outlines (what is visible from above), approximated to ~0.25-0.5 m. confidence: high = clearly a roofed building; medium = roof clear but extent/separation uncertain; low = may not be a building or may be roofless. Buildings crossing a window edge are clipped at the edge. Must be reviewed/corrected by a human before any metric is computed.",
+  "created": "2026-10-04",
+  "windows": {
+    "W1_dense_informal": [
+      {"poly": [[165,0],[408,0],[408,125],[165,125]], "confidence": "high", "note": "orange sheet roof, clipped at top edge"},
+      {"poly": [[170,125],[332,125],[332,315],[170,315]], "confidence": "high", "note": "corrugated metal roof"},
+      {"poly": [[172,318],[375,318],[375,500],[170,500]], "confidence": "high", "note": "large grey metal roof"},
+      {"poly": [[378,445],[428,445],[428,500],[378,500]], "confidence": "medium", "note": "small grey annex roof"},
+      {"poly": [[240,500],[430,500],[430,685],[240,685]], "confidence": "high", "note": "white roof with skylights"},
+      {"poly": [[248,685],[437,685],[437,800],[248,800]], "confidence": "high", "note": "white/yellow/grey roof, clipped at bottom edge"},
+      {"poly": [[440,688],[535,688],[535,800],[440,800]], "confidence": "high", "note": "grey roof, clipped at bottom"},
+      {"poly": [[540,690],[800,690],[800,785],[540,785]], "confidence": "high", "note": "rusty corrugated roof, clipped at right"},
+      {"poly": [[528,0],[672,0],[672,185],[528,185]], "confidence": "high", "note": "grey hipped metal roof, clipped at top"},
+      {"poly": [[672,0],[752,0],[752,165],[672,165]], "confidence": "high", "note": "grey metal roof, clipped at top"},
+      {"poly": [[665,170],[750,170],[750,252],[665,252]], "confidence": "high", "note": "grey metal roof"},
+      {"poly": [[448,212],[518,212],[518,298],[448,298]], "confidence": "high", "note": "small grey roof"},
+      {"poly": [[443,302],[578,302],[578,385],[443,385]], "confidence": "high", "note": "rusty corrugated roof"},
+      {"poly": [[650,428],[800,428],[800,695],[650,695]], "confidence": "medium", "note": "flat concrete slab with brick parapet; likely a flat roof (common locally) but could be a paved terrace"},
+      {"poly": [[0,108],[72,108],[72,155],[0,155]], "confidence": "medium", "note": "small corrugated roof, clipped at left"},
+      {"poly": [[0,602],[212,602],[212,682],[0,682]], "confidence": "high", "note": "rusty/grey corrugated roofs, clipped at left; may be 2 structures"},
+      {"poly": [[0,752],[55,752],[55,800],[0,800]], "confidence": "medium", "note": "rusty roof corner, clipped"},
+      {"poly": [[0,0],[100,0],[100,20],[0,20]], "confidence": "low", "note": "thin sliver of roof at top-left corner"}
+    ],
+    "W2_formal_residential": [
+      {"poly": [[208,152],[300,150],[350,112],[420,105],[420,25],[553,30],[553,110],[580,118],[580,230],[530,232],[400,335],[210,330]], "confidence": "high", "note": "dark slate multi-wing house roof; outline simplified"},
+      {"poly": [[222,100],[408,100],[408,150],[222,150]], "confidence": "low", "note": "glass sunroom/conservatory attached to house; paved patio above it excluded"},
+      {"poly": [[252,408],[355,408],[460,428],[565,432],[565,525],[550,548],[550,698],[235,698],[235,525],[252,525]], "confidence": "high", "note": "red clay-tile house roof incl. grey glazed strip at bottom"},
+      {"poly": [[220,372],[420,372],[420,405],[220,405]], "confidence": "low", "note": "dark barrel-vault covered walkway"},
+      {"poly": [[588,665],[620,665],[620,755],[588,755]], "confidence": "low", "note": "small tiled structure/wall cap"},
+      {"poly": [[0,725],[50,725],[50,800],[0,800]], "confidence": "medium", "note": "neighbouring dark roof, clipped at corner"},
+      {"poly": [[178,190],[208,190],[208,300],[178,300]], "confidence": "low", "note": "dark strip west of slate house; possibly a lean-to roof, possibly shadow/path"}
+    ],
+    "W3_large_sheds": [
+      {"poly": [[0,30],[455,58],[455,440],[0,440]], "confidence": "high", "note": "large grey shed roof (west); top edge partly under hedge"},
+      {"poly": [[455,62],[800,85],[800,440],[455,440]], "confidence": "high", "note": "large grey shed roof (east); NE part occluded by tree canopy, clipped at right"},
+      {"poly": [[122,448],[590,448],[590,530],[122,530]], "confidence": "high", "note": "rusty corrugated roof row"},
+      {"poly": [[122,530],[588,530],[588,730],[435,730],[435,750],[60,750],[60,622],[122,600]], "confidence": "high", "note": "large grey sheet-metal shed"},
+      {"poly": [[58,752],[438,752],[438,800],[58,800]], "confidence": "medium", "note": "lighter grey roof, may be part of the shed above; clipped at bottom"},
+      {"poly": [[435,735],[600,735],[600,800],[435,800]], "confidence": "medium", "note": "corrugated roof with yellow panels, clipped"},
+      {"poly": [[590,452],[665,452],[665,615],[590,615]], "confidence": "high", "note": "blue-grey roof"},
+      {"poly": [[665,455],[745,455],[745,525],[665,525]], "confidence": "high", "note": "red curved roof"},
+      {"poly": [[750,455],[800,455],[800,630],[750,630]], "confidence": "medium", "note": "rusty roof strips, clipped at right"},
+      {"poly": [[600,700],[748,700],[748,800],[600,800]], "confidence": "medium", "note": "grey roof, clipped at bottom"},
+      {"poly": [[748,705],[800,705],[800,800],[748,800]], "confidence": "medium", "note": "white roof corner, clipped"}
+    ],
+    "W4_vegetation": [
+      {"poly": [[112,128],[340,132],[372,180],[372,512],[75,505],[78,300],[108,180]], "confidence": "high", "note": "large two-tone pitched roof among trees"},
+      {"poly": [[720,690],[800,690],[800,800],[675,800],[675,745]], "confidence": "medium", "note": "pink roof, clipped at bottom-right corner"}
+    ]
+  },
+  "excluded_on_purpose": [
+    "W1: vehicles, walled yards, rubble/debris strip at left x<170 y 300-350",
+    "W2: paved patio above sunroom, white boundary wall along road, garden/trees",
+    "W4: roofless metal frame (top centre), stairs, brick boundary wall, small yellow container"
+  ]
+}

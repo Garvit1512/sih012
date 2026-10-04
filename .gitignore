@@ -1,0 +1,61 @@
+# ---- Python / environments ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- secrets / local config ----
+.env
+.env.*
+*.pem
+*.key
+
+# ---- IDE / OS ----
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+*.tmp
+
+# ---- model checkpoints (download separately, see README "Models") ----
+models/**/*.pt
+models/**/*.pth
+models/**/*.zip
+models/**/*.safetensors
+models/**/*.onnx
+
+# ---- source imagery (provenance/licence not verified for redistribution) ----
+data/*.tif
+data/*.tiff
+data/*.png
+data/*.jpg
+
+# ---- imagery-derived figures (show the orthophoto) ----
+data/validation*/contact_sheet.png
+data/validation*/review/
+outputs/**/*.png
+outputs/rgb_guided_reviewed/cut_panels/
+outputs/rgb_guided_reviewed/cut_sheets/
+
+# ---- large derived raster (34 MB; regenerate with run_building_inference.py) ----
+outputs/sf_church_st_sample_native/probability.tif
+
+# ---- third-party dataset (Microsoft ML footprints, ODbL) — fetch with scripts/fetch_ms_footprints.py ----
+data/reference/
+
+# ---- generated app data bundles (contain a rendering of the orthophoto) ----
+app/data/
+app/data_v2/
+app/data_*/
+
+# ---- local review exports / browser test artifacts ----
+outputs/app_exports/
+**/browser_profile/
+**/e2e_prof*/

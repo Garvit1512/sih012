@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "checks": {
+    "every_provisional_label_has_explicit_decision": true,
+    "decisions_valid": true,
+    "all_reviewed_features_approved": true,
+    "buildings_not_ignored": true,
+    "uncertain_and_regions_ignored": true,
+    "every_confirmed_or_edited_label_present": true,
+    "added_ignore_regions_present": true,
+    "ignores_do_not_cover_buildings": true,
+    "edits_applied": true,
+    "all_geometries_valid": true,
+    "crs": "EPSG:32719"
+  },
+  "counts": {
+    "building_labels": 49,
+    "ignore_features": 25,
+    "by_decision": {
+      "confirm": 47,
+      "uncertain": 9,
+      "added_ignore_region": 9,
+      "keep_ignore": 7,
+      "edit": 2
+    }
+  }
+}

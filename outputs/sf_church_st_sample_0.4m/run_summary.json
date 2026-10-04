@@ -1,0 +1,27 @@
+{
+  "image": "data\\sf_church_st_sample.tif",
+  "weights": "E:\\sih012\\models\\best.pt",
+  "crs": "EPSG:32610",
+  "source_bounds": [
+    550535.501716,
+    4179735.1985851764,
+    550595.501716,
+    4179795.196294079
+  ],
+  "native_res_m": [
+    0.020000000000004427,
+    0.01999923630083014
+  ],
+  "inference_res_m": 0.40000000000008856,
+  "inference_shape": [
+    150,
+    150
+  ],
+  "norm": "min_max_image_net",
+  "threshold": 0.4,
+  "min_area_m2": 10.0,
+  "simplify_m": 0.20000000000004428,
+  "feature_count": 3,
+  "building_fraction_of_valid": 0.41235555555555553,
+  "runtime_s": 1.3
+}

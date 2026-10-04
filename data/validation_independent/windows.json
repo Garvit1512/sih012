@@ -1,0 +1,59 @@
+{
+  "crs": "EPSG:32719",
+  "size_m": 40,
+  "selection": "chosen 2026-10-04 by land-use type from the raw orthophoto (no predictions/labels shown), before reviewing any cut panels; not used to choose thresholds or design splits",
+  "windows": [
+    {
+      "id": "V1_dense_informal",
+      "bounds": [
+        600697.81,
+        8171194.55,
+        600737.81,
+        8171234.55
+      ],
+      "top_left_offset_m": [
+        25,
+        185
+      ]
+    },
+    {
+      "id": "V2_large_sheds",
+      "bounds": [
+        600812.81,
+        8171161.55,
+        600852.81,
+        8171201.55
+      ],
+      "top_left_offset_m": [
+        140,
+        218
+      ]
+    },
+    {
+      "id": "V3_residential",
+      "bounds": [
+        600900.81,
+        8171157.55,
+        600940.81,
+        8171197.55
+      ],
+      "top_left_offset_m": [
+        228,
+        222
+      ]
+    },
+    {
+      "id": "V4_small_roofs",
+      "bounds": [
+        600732.81,
+        8171239.55,
+        600772.81,
+        8171279.55
+      ],
+      "top_left_offset_m": [
+        60,
+        140
+      ]
+    }
+  ]
+}

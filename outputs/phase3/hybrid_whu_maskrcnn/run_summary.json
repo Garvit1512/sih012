@@ -1,0 +1,26 @@
+{
+  "image": "data\\lapaz_predio_bisa.tif",
+  "crs": "EPSG:32719",
+  "source_bounds": [
+    600672.8055400001,
+    8171065.547730001,
+    600984.8055400001,
+    8171419.547730001
+  ],
+  "native_res_m": [
+    0.05,
+    0.05
+  ],
+  "inference_res_m": 0.30000000000000004,
+  "threshold": 0.5,
+  "min_area_m2": 10.0,
+  "simplify_m": 0.15000000000000002,
+  "method": "D: WHU mask partitioned by Mask R-CNN instances (PROTOCOL.md amendment 1)",
+  "whu_dir": "outputs\\lapaz_predio_bisa_whu_0.3m",
+  "instance_dir": "outputs\\phase3\\maskrcnn_0.3m",
+  "min_seed_m2": 10.0,
+  "whu_components": 123,
+  "instances": 166,
+  "feature_count": 117,
+  "baseline_feature_count": 74
+}

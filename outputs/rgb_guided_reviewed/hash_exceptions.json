@@ -1,0 +1,14 @@
+{
+  "_note": "Files that changed after the preserved_hashes.sha256 snapshot through no command run in this task. Each is allowed ONLY at current_sha256; any further change fails tests/test_cut_review.py.",
+  "exceptions": [
+    {
+      "path": "scripts/rgb_guided_instances.py",
+      "snapshot_sha256": "0e39fbc35b2695c8e8e9d00c02e3720d0306950db2804537f7a6f2ba9dc77b2a",
+      "current_sha256": "99a4ebdfab37989176513ba5ef43f7f8256f440fb7e07f67ad72cd904832c6c7",
+      "detected": "2026-10-04 (file mtime 12:07:37 +0530, snapshot taken 12:00:15)",
+      "observed": "file now has CRLF line endings; content differs from snapshot even after CRLF->LF normalisation; exact original not recoverable",
+      "verification": "re-running the current script on outputs/lapaz_predio_bisa_whu_0.3m reproduced instances.tif, candidate_regions.tif, buildings.geojson, cut_lines.geojson and candidate_lines.geojson of outputs/rgb_guided_v1 byte-identically",
+      "action": "not reverted (change not made by this task); reported to user"
+    }
+  ]
+}

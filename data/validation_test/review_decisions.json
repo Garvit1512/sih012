@@ -1,0 +1,87 @@
+{
+  "_README": "Per-label review decisions for held-out test windows T1-T4 by the project user (2026-10-04), from raw imagery and draft outlines only (no predictions shown). confirm = building; uncertain = ignore; keep_ignore = drafted ignore retained.",
+  "reviewer": "project user",
+  "review_date": "2026-10-04",
+  "confirmed_labels_take_precedence": true,
+  "precedence_note": "same rule as V1-V4: ignore areas are clipped so they never remove confirmed building pixels",
+  "all_windows_confirmed": {
+    "by": "project user",
+    "date": "2026-10-04"
+  },
+  "windows": {
+    "T1_mixed_west": {
+      "decisions": {
+        "T1-01": "confirm",
+        "T1-02": "confirm",
+        "T1-03": "uncertain",
+        "T1-04": "uncertain",
+        "T1-05": "uncertain",
+        "T1-06": "confirm",
+        "T1-07": "confirm",
+        "T1-08": "confirm",
+        "T1-09": "keep_ignore",
+        "T1-10": "keep_ignore",
+        "T1-11": "keep_ignore",
+        "T1-12": "keep_ignore"
+      },
+      "added_ignore_regions": []
+    },
+    "T2_dense_south_centre": {
+      "decisions": {
+        "T2-01": "confirm",
+        "T2-02": "confirm",
+        "T2-03": "confirm",
+        "T2-04": "confirm",
+        "T2-05": "confirm",
+        "T2-06": "confirm",
+        "T2-07": "uncertain",
+        "T2-08": "confirm",
+        "T2-09": "keep_ignore",
+        "T2-10": "confirm",
+        "T2-11": "uncertain",
+        "T2-12": "uncertain",
+        "T2-13": "confirm",
+        "T2-14": "confirm",
+        "T2-15": "confirm",
+        "T2-16": "confirm",
+        "T2-17": "confirm",
+        "T2-18": "confirm",
+        "T2-19": "confirm",
+        "T2-20": "keep_ignore"
+      },
+      "added_ignore_regions": []
+    },
+    "T3_residential_north": {
+      "decisions": {
+        "T3-01": "confirm",
+        "T3-02": "keep_ignore",
+        "T3-03": "keep_ignore"
+      },
+      "added_ignore_regions": []
+    },
+    "T4_dense_south_west": {
+      "decisions": {
+        "T4-01": "uncertain",
+        "T4-02": "uncertain",
+        "T4-03": "confirm",
+        "T4-04": "confirm",
+        "T4-05": "confirm",
+        "T4-06": "confirm",
+        "T4-07": "uncertain",
+        "T4-08": "uncertain",
+        "T4-09": "uncertain",
+        "T4-10": "confirm",
+        "T4-11": "confirm",
+        "T4-12": "confirm",
+        "T4-13": "confirm",
+        "T4-14": "confirm",
+        "T4-15": "keep_ignore",
+        "T4-16": "keep_ignore",
+        "T4-17": "keep_ignore",
+        "T4-18": "keep_ignore",
+        "T4-19": "keep_ignore"
+      },
+      "added_ignore_regions": []
+    }
+  }
+}

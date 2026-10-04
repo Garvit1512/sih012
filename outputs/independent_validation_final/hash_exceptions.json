@@ -1,0 +1,14 @@
+{
+  "_note": "Files changed after a recorded hash snapshot through no command run in this task. Allowed ONLY at current_sha256.",
+  "exceptions": [
+    {
+      "path": "scripts/score_models.py",
+      "snapshot_sha256": "2c50b81fb9dc40fdcceb9eff6b50b47bb66754b7b6fd23f8c4a42ed61cf5ff4c",
+      "current_sha256": "036a7c458515a0d1eb438f4a09dbd457da07f88b60fbdb96b3eda98cdbbe52fa",
+      "detected": "2026-10-04 (mtime 14:31:52 +0530, after freeze manifest 14:29:22)",
+      "observed": "now CRLF line endings; differs from snapshot even after CRLF->LF normalisation; scoring logic reviewed (IoU 0.5, eval_res 0.1, min piece 2.0 unchanged)",
+      "verification": "current file reproduces outputs/rgb_guided_reviewed/final/evaluation_independent_V1-V4 and evaluation_diagnostic_W1-W4 scores.json metrics and scores.md byte-identically",
+      "action": "not reverted; reported to user"
+    }
+  ]
+}

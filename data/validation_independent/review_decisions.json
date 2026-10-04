@@ -1,0 +1,345 @@
+{
+  "_README": "Per-label review decisions for the independent V1-V4 labels, made by the project user window by window from the original orthophoto (guided by Claude; no model predictions shown). confirm = approved building label; uncertain = approved as ignore (building separation not established by imagery); keep_ignore = provisional ignore retained. added_ignore_regions are new pixel-space polygons (800x800 crop, 0.05 m) that are excluded from scoring. The provisional file is never modified.",
+  "reviewer": "project user",
+  "review_date": "2026-10-04",
+  "windows": {
+    "V1_dense_informal": {
+      "decisions": {
+        "V1-01": "confirm",
+        "V1-02": "confirm",
+        "V1-03": "confirm",
+        "V1-04": "confirm",
+        "V1-06": "confirm",
+        "V1-08": "confirm",
+        "V1-09": "confirm",
+        "V1-10": "confirm",
+        "V1-13": "confirm",
+        "V1-14": "confirm",
+        "V1-15": "confirm",
+        "V1-17": "confirm",
+        "V1-18": "confirm",
+        "V1-05": "uncertain",
+        "V1-07": "uncertain",
+        "V1-11": "uncertain",
+        "V1-16": "uncertain",
+        "V1-12": "keep_ignore",
+        "V1-19": "keep_ignore"
+      },
+      "added_ignore_regions": [
+        {
+          "poly": [
+            [
+              345,
+              400
+            ],
+            [
+              410,
+              400
+            ],
+            [
+              410,
+              500
+            ],
+            [
+              345,
+              500
+            ]
+          ],
+          "note": "grey/brown sheet roofs right of V1-12 - building status unclear"
+        },
+        {
+          "poly": [
+            [
+              565,
+              580
+            ],
+            [
+              640,
+              580
+            ],
+            [
+              640,
+              665
+            ],
+            [
+              565,
+              665
+            ]
+          ],
+          "note": "cluttered sheet structure below V1-19 - building status unclear"
+        }
+      ],
+      "notes": "user selections: seams V1-05, V1-11 uncertain (V1-02, V1-13 confirmed as single); patchwork V1-07, V1-16 uncertain (V1-06, V1-17 confirmed); unlabelled structures added as ignore regions; clear labels confirmed"
+    },
+    "V2_large_sheds": {
+      "decisions": {
+        "V2-02": "confirm",
+        "V2-03": "confirm",
+        "V2-05": "confirm",
+        "V2-07": "confirm",
+        "V2-08": "confirm",
+        "V2-09": "confirm",
+        "V2-10": "confirm",
+        "V2-11": "confirm",
+        "V2-12": "confirm",
+        "V2-13": "confirm",
+        "V2-01": "uncertain",
+        "V2-04": "uncertain",
+        "V2-06": "uncertain",
+        "V2-14": "keep_ignore"
+      },
+      "added_ignore_regions": [
+        {
+          "poly": [
+            [
+              235,
+              688
+            ],
+            [
+              330,
+              688
+            ],
+            [
+              330,
+              770
+            ],
+            [
+              235,
+              770
+            ]
+          ],
+          "note": "open shed interior with timber - roofed or open unclear"
+        },
+        {
+          "poly": [
+            [
+              490,
+              688
+            ],
+            [
+              520,
+              688
+            ],
+            [
+              520,
+              795
+            ],
+            [
+              490,
+              795
+            ]
+          ],
+          "note": "open shed interior - roofed or open unclear"
+        }
+      ],
+      "notes": "V2-01 outline over concrete band -> uncertain; V2-04, V2-06 possibly multiple structures -> uncertain; V2-09 confirmed as one gable roof (ridge at x~550 not a boundary); interiors added as ignore regions; clear labels confirmed"
+    },
+    "V3_residential": {
+      "decisions": {
+        "V3-01": "confirm",
+        "V3-02": "confirm",
+        "V3-03": "confirm",
+        "V3-06": "confirm",
+        "V3-07": "confirm",
+        "V3-08": "confirm",
+        "V3-09": "confirm",
+        "V3-10": "confirm",
+        "V3-11": "confirm",
+        "V3-13": "confirm",
+        "V3-14": "confirm",
+        "V3-15": "confirm",
+        "V3-17": "confirm",
+        "V3-18": "confirm",
+        "V3-19": "confirm",
+        "V3-04": "uncertain",
+        "V3-05": "edit",
+        "V3-12": "keep_ignore",
+        "V3-16": "keep_ignore"
+      },
+      "edits": {
+        "V3-05": {
+          "poly": [
+            [
+              700,
+              35
+            ],
+            [
+              783,
+              35
+            ],
+            [
+              783,
+              310
+            ],
+            [
+              690,
+              305
+            ]
+          ],
+          "reason": "provisional outline ran to x=800 over the neighbouring purple roof; trimmed to the white roof's visible edge at x~783"
+        }
+      },
+      "added_ignore_regions": [
+        {
+          "poly": [
+            [
+              480,
+              50
+            ],
+            [
+              700,
+              50
+            ],
+            [
+              700,
+              105
+            ],
+            [
+              480,
+              105
+            ]
+          ],
+          "note": "dark flat surface with objects - roof terrace or yard unclear"
+        },
+        {
+          "poly": [
+            [
+              785,
+              35
+            ],
+            [
+              800,
+              35
+            ],
+            [
+              800,
+              310
+            ],
+            [
+              785,
+              310
+            ]
+          ],
+          "note": "purple sliver of neighbouring roof, clipped at window edge"
+        },
+        {
+          "poly": [
+            [
+              612,
+              735
+            ],
+            [
+              645,
+              735
+            ],
+            [
+              645,
+              785
+            ],
+            [
+              612,
+              785
+            ]
+          ],
+          "note": "small red structure - building status unclear"
+        }
+      ],
+      "notes": "V3-04 uncertain (one house vs several units); V3-05 trimmed; three ambiguous areas added as ignore regions; clear labels confirmed (V3-03 is below the 10 m2 output minimum)"
+    },
+    "V4_small_roofs": {
+      "decisions": {
+        "V4-01": "confirm",
+        "V4-02": "confirm",
+        "V4-04": "confirm",
+        "V4-05": "confirm",
+        "V4-06": "confirm",
+        "V4-08": "confirm",
+        "V4-09": "confirm",
+        "V4-10": "confirm",
+        "V4-11": "confirm",
+        "V4-03": "uncertain",
+        "V4-07": "edit",
+        "V4-12": "keep_ignore",
+        "V4-13": "keep_ignore"
+      },
+      "edits": {
+        "V4-07": {
+          "poly": [
+            [
+              425,
+              168
+            ],
+            [
+              635,
+              42
+            ],
+            [
+              680,
+              128
+            ],
+            [
+              470,
+              248
+            ],
+            [
+              440,
+              245
+            ]
+          ],
+          "reason": "provisional outline had a notch at (600,95) cutting off part of the rotated roof; top edge straightened"
+        }
+      },
+      "added_ignore_regions": [
+        {
+          "poly": [
+            [
+              0,
+              40
+            ],
+            [
+              45,
+              40
+            ],
+            [
+              45,
+              180
+            ],
+            [
+              0,
+              180
+            ]
+          ],
+          "note": "clipped yellow roof / grey structures at left edge - building status unclear"
+        },
+        {
+          "poly": [
+            [
+              700,
+              0
+            ],
+            [
+              790,
+              0
+            ],
+            [
+              790,
+              30
+            ],
+            [
+              700,
+              30
+            ]
+          ],
+          "note": "clipped white structures at top right - building status unclear"
+        }
+      ],
+      "notes": "V4-03 uncertain (separate building vs lower level of V4-02); V4-07 outline straightened (pending visual check); two clipped edge areas added as ignore regions; clear labels confirmed"
+    }
+  },
+  "confirmed_labels_take_precedence": true,
+  "precedence_note": "approved by project user 2026-10-04: ignore areas are clipped so they never remove confirmed building pixels; confirmed-vs-confirmed overlaps (<=4.9 m2, tracing tolerance along shared walls) left as drawn",
+  "all_windows_confirmed": {
+    "by": "project user",
+    "date": "2026-10-04"
+  }
+}

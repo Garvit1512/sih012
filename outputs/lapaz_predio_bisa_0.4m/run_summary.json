@@ -1,0 +1,27 @@
+{
+  "image": "data\\lapaz_predio_bisa.tif",
+  "weights": "E:\\sih012\\models\\best.pt",
+  "crs": "EPSG:32719",
+  "source_bounds": [
+    600672.8055400001,
+    8171065.547730001,
+    600984.8055400001,
+    8171419.547730001
+  ],
+  "native_res_m": [
+    0.05,
+    0.05
+  ],
+  "inference_res_m": 0.4,
+  "inference_shape": [
+    885,
+    780
+  ],
+  "norm": "min_max_image_net",
+  "threshold": 0.4,
+  "min_area_m2": 10.0,
+  "simplify_m": 0.2,
+  "feature_count": 6,
+  "building_fraction_of_valid": 0.0373372378810856,
+  "runtime_s": 3.3
+}

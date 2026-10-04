@@ -1,0 +1,46 @@
+{
+  "image": "data\\lapaz_predio_bisa.tif",
+  "crs": "EPSG:32719",
+  "source_bounds": [
+    600672.8055400001,
+    8171065.547730001,
+    600984.8055400001,
+    8171419.547730001
+  ],
+  "native_res_m": [
+    0.05,
+    0.05
+  ],
+  "inference_res_m": 0.30000000000000004,
+  "threshold": 0.5,
+  "min_area_m2": 10.0,
+  "simplify_m": 0.15000000000000002,
+  "model": "whu-unetplusplus-efficientnet-b4",
+  "hf_revision": "09df9efd323bbd3d56b98b4857129eb9b5baa2d3",
+  "postprocess": "rgb_guided_v1: chromaticity region growing + guard merges + contrast/edge-support merges",
+  "baseline_dir": "outputs\\lapaz_predio_bisa_whu_0.3m",
+  "baseline_input_sha256": {
+    "probability.tif": "8699a44adccf7912972c26f78213cc077bc25d1ef172f82236459c58de970e2d",
+    "mask.tif": "c44aa98e52525ae16470c1ce1ceca7177e54a4c818926de1f0c13ac073edc915",
+    "run_summary.json": "205d98c11bccc2eeefcd3f5a819e87e19aa217acdccd1d7a53e619135081d67c"
+  },
+  "params": {
+    "min_contrast": 0.04,
+    "min_edge_support": 0.3,
+    "min_part": 10.0,
+    "min_outer_contact": 0.25,
+    "seed_percentile": 30.0,
+    "strong_percentile": 75.0
+  },
+  "seed_grad_threshold": 0.00192,
+  "strong_grad_threshold": 0.00866,
+  "connected_components": 123,
+  "candidate_regions": 363,
+  "instances": 181,
+  "proposed_cuts": 62,
+  "cuts_high": 27,
+  "feature_count": 132,
+  "baseline_feature_count": 74,
+  "building_pixels": 155685,
+  "runtime_s": 34.1
+}

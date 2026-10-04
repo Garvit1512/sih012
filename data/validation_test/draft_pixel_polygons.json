@@ -1,0 +1,68 @@
+{
+  "_README": "PROVISIONAL, UNREVIEWED reference outlines for held-out test windows T1-T4 (windows.json). Vertices are (col,row) pixels of each 800x800 crop at 0.05 m, origin top-left. Traced by the AI assistant (Claude) on 2026-10-04 from raw orthophoto crops with a 2.5 m grid. No prediction, probability or cut layer has been rendered for these windows. ignore=true marks ambiguous structures to exclude from scoring. Must be reviewed by the user before any T-window scoring (outputs/phase3/PROTOCOL.md).",
+  "created": "2026-10-04",
+  "windows": {
+    "T1_mixed_west": [
+      {"poly": [[0,0],[95,0],[95,305],[0,305]], "confidence": "high", "note": "grey shed roof with yellow skylights, clipped left/top"},
+      {"poly": [[262,238],[330,238],[330,365],[262,365]], "confidence": "high", "note": "grey corrugated roof"},
+      {"poly": [[320,275],[385,275],[385,345],[320,345]], "confidence": "medium", "note": "white sheet roof between grey roofs; may belong to neighbour"},
+      {"poly": [[380,300],[445,300],[445,355],[380,355]], "confidence": "medium", "note": "grey roof, lower right of cluster"},
+      {"poly": [[400,150],[445,150],[445,300],[400,300]], "confidence": "medium", "note": "long narrow rusty roof strip"},
+      {"poly": [[390,585],[500,585],[500,800],[390,800]], "confidence": "high", "note": "pink corrugated roof, clipped bottom"},
+      {"poly": [[695,570],[800,570],[800,800],[695,800]], "confidence": "high", "note": "pink roof, clipped right/bottom"},
+      {"poly": [[45,705],[150,705],[150,800],[45,800]], "confidence": "medium", "note": "rusty roof, clipped bottom"},
+      {"poly": [[150,600],[390,600],[390,800],[150,800]], "confidence": "low", "ignore": true, "note": "rusty/grey patchwork of several roofs - separation unclear"},
+      {"poly": [[215,560],[390,560],[390,600],[215,600]], "confidence": "low", "ignore": true, "note": "white parapet/roof edge with openings - ambiguous"},
+      {"poly": [[640,580],[700,580],[700,800],[640,800]], "confidence": "low", "ignore": true, "note": "narrow cluttered grey structures - ambiguous"},
+      {"poly": [[60,0],[205,0],[205,50],[60,50]], "confidence": "low", "ignore": true, "note": "white-outlined enclosure at top - roof or yard unclear"}
+    ],
+    "T2_dense_south_centre": [
+      {"poly": [[0,0],[195,0],[195,55],[0,55]], "confidence": "high", "note": "grey/white roof, clipped top"},
+      {"poly": [[15,55],[135,55],[135,185],[15,185]], "confidence": "high", "note": "grey roof with ridge line"},
+      {"poly": [[135,95],[195,95],[195,185],[135,185]], "confidence": "medium", "note": "beige/grey small roof"},
+      {"poly": [[70,185],[195,185],[195,240],[70,240]], "confidence": "medium", "note": "white/beige roof strip"},
+      {"poly": [[120,240],[190,240],[190,300],[120,300]], "confidence": "medium", "note": "flat roof with two water tanks, orange parapet"},
+      {"poly": [[65,335],[185,335],[185,395],[65,395]], "confidence": "medium", "note": "beige corrugated roof"},
+      {"poly": [[0,395],[180,395],[180,500],[0,500]], "confidence": "medium", "note": "yellow/beige roofs; may be two structures"},
+      {"poly": [[0,515],[180,515],[180,590],[0,590]], "confidence": "medium", "note": "white/grey roof"},
+      {"poly": [[185,165],[250,165],[250,490],[185,490]], "confidence": "low", "ignore": true, "note": "narrow column of mixed grey/rusty sheets - several structures, unclear"},
+      {"poly": [[180,500],[250,500],[250,650],[180,650]], "confidence": "medium", "note": "grey roof"},
+      {"poly": [[358,0],[500,0],[500,90],[358,90]], "confidence": "medium", "note": "rusty roof, clipped top; seam at y~90 with roof below"},
+      {"poly": [[358,90],[495,90],[495,185],[358,185]], "confidence": "medium", "note": "rusty/white patched roof"},
+      {"poly": [[360,205],[500,205],[500,330],[360,330]], "confidence": "high", "note": "rusty corrugated roof"},
+      {"poly": [[440,365],[545,365],[545,500],[440,500]], "confidence": "medium", "note": "white/yellow mixed sheet roof"},
+      {"poly": [[545,345],[725,345],[725,500],[545,500]], "confidence": "high", "note": "grey corrugated roof (part over no-data excluded by scorer)"},
+      {"poly": [[610,255],[740,255],[740,345],[610,345]], "confidence": "high", "note": "grey/yellow roof"},
+      {"poly": [[705,85],[755,85],[755,160],[705,160]], "confidence": "medium", "note": "small white roof"},
+      {"poly": [[315,505],[530,505],[530,665],[315,665]], "confidence": "high", "note": "pink roof"},
+      {"poly": [[0,650],[260,650],[260,800],[0,800]], "confidence": "high", "note": "green roof with blue panel strip, clipped"},
+      {"poly": [[255,505],[300,505],[300,560],[255,560]], "confidence": "low", "ignore": true, "note": "small structure - ambiguous"}
+    ],
+    "T3_residential_north": [
+      {"poly": [[415,15],[745,15],[745,250],[610,250],[610,330],[600,330],[600,545],[310,545],[310,290],[415,290]], "confidence": "high", "note": "single large house: red tile roofs + flat white roof with pyramid skylight"},
+      {"poly": [[222,330],[310,330],[310,495],[222,495]], "confidence": "low", "ignore": true, "note": "flat pink roof terrace attached to house - part of same building or terrace, unclear"},
+      {"poly": [[740,0],[800,0],[800,130],[740,130]], "confidence": "low", "ignore": true, "note": "dark clipped structure at top right - ambiguous"}
+    ],
+    "T4_dense_south_west": [
+      {"poly": [[110,0],[210,0],[210,265],[110,265]], "confidence": "medium", "note": "rusty roof column, clipped top"},
+      {"poly": [[210,90],[270,90],[270,395],[210,395]], "confidence": "medium", "note": "long narrow rusty roof"},
+      {"poly": [[0,250],[210,250],[210,360],[0,360]], "confidence": "high", "note": "pink roof, clipped left"},
+      {"poly": [[0,360],[200,360],[200,400],[0,400]], "confidence": "medium", "note": "grey strip roof below pink roof"},
+      {"poly": [[335,15],[395,15],[395,100],[335,100]], "confidence": "high", "note": "small white/grey roof"},
+      {"poly": [[630,0],[690,0],[690,120],[630,120]], "confidence": "medium", "note": "rusty/white roof, clipped top"},
+      {"poly": [[255,350],[370,350],[370,440],[255,440]], "confidence": "medium", "note": "rusty roof"},
+      {"poly": [[370,340],[490,340],[490,430],[370,430]], "confidence": "medium", "note": "grey/white/rusty roof"},
+      {"poly": [[490,355],[675,355],[675,445],[490,445]], "confidence": "medium", "note": "rusty roof"},
+      {"poly": [[750,395],[800,395],[800,445],[750,445]], "confidence": "high", "note": "rusty roof, clipped right"},
+      {"poly": [[640,450],[800,450],[800,640],[640,640]], "confidence": "high", "note": "pink roof, clipped right"},
+      {"poly": [[465,430],[680,450],[650,580],[465,555]], "confidence": "medium", "note": "grey roof with dark panels, rotated"},
+      {"poly": [[550,590],[640,590],[640,710],[550,710]], "confidence": "medium", "note": "yellow translucent roof"},
+      {"poly": [[605,625],[770,625],[770,760],[605,760]], "confidence": "medium", "note": "grey roof"},
+      {"poly": [[40,400],[465,400],[465,800],[240,800],[40,560]], "confidence": "low", "ignore": true, "note": "rotated complex of grey/white roofs - building separation unclear"},
+      {"poly": [[0,0],[60,0],[60,80],[0,80]], "confidence": "low", "ignore": true, "note": "clipped structures top-left - ambiguous"},
+      {"poly": [[465,0],[530,0],[530,80],[465,80]], "confidence": "low", "ignore": true, "note": "small grey/rust structures - ambiguous"},
+      {"poly": [[670,380],[705,380],[705,445],[670,445]], "confidence": "low", "ignore": true, "note": "small grey structure - ambiguous"},
+      {"poly": [[590,745],[800,745],[800,800],[590,800]], "confidence": "low", "ignore": true, "note": "clipped roofs at bottom right - ambiguous"}
+    ]
+  }
+}
