@@ -13,3 +13,9 @@ numpy==2.5.3
 pandas==3.0.6
 scipy==1.18.1
 pillow==12.3.0
+
+# FastAPI backend (backend/): installed 2026-10-05 into the project venv
+fastapi==0.142.2
+uvicorn==0.54.0
+pydantic==2.13.5
+httpx==0.28.1   # test client only

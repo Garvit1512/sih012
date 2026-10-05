@@ -236,4 +236,9 @@ select { width: 100%; height: 30px; padding: 0 28px 0 9px; font: var(--fs-sm) va
   .appbar-mid { order: 3; flex-basis: 100%; }
   .shell { height: auto; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* topology conflicts: slow, subtle pulse; the 200 ms shared-edge flash is the only fast animation */
+@keyframes conflict-pulse { 0%, 100% { fill-opacity: .22; } 50% { fill-opacity: .5; } }
+path.conflict-pulse { animation: conflict-pulse 3.2s ease-in-out infinite; }
+path.edge-flash { stroke-linecap: round; filter: drop-shadow(0 0 4px #fb7185); }
+#topology-note { margin: 2px 0 6px; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } path.conflict-pulse { animation: none; } }

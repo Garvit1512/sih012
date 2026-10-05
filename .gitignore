@@ -59,3 +59,6 @@ app/data_*/
 outputs/app_exports/
 **/browser_profile/
 **/e2e_prof*/
+
+# ---- FastAPI backend: server-side review workspace ----
+outputs/backend_workspace/

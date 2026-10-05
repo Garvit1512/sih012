@@ -58,7 +58,19 @@
     $("project-info").innerHTML = `<dt>Status</dt><dd>Data not loaded</dd>`;
     return;
   }
-  fetch("/api/health").then((r) => r.json()).then((h) => chip("hdr-conn", h.ok ? "Server connected · data loaded" : "Server not ready", h.ok ? "ok" : "err"))
+  // Optional FastAPI backend (backend/main.py). Without it the app runs exactly as before from /data (offline fallback).
+  let api = null;
+  try {
+    const sites = await getJSON("/api/sites");
+    if (sites.sites && sites.sites.length) {
+      const site = await getJSON("/api/sites/" + sites.sites[0].id);
+      api = { site, layers: (await getJSON(`/api/sites/${site.id}/layers`)).layers };
+    }
+  } catch (e) { api = null; }
+  const orthoUrl = api ? api.site.imagery_info.display_url : "/data/ortho_3857.png";
+  const orthoBounds = api ? api.site.imagery_info.display_bounds_latlon : ortho.bounds_latlon;
+  const layerId = (k) => { const l = api && api.layers.find((x) => x.legacy_key === k); return l ? l.id : null; };
+  fetch("/api/health").then((r) => r.json()).then((h) => chip("hdr-conn", h.ok ? "Server connected · data loaded" + (api ? " · topology API" : " · basic server") : "Server not ready", h.ok ? "ok" : "err"))
     .catch(() => chip("hdr-conn", "Server unreachable — export disabled", "err"));
 
   const keys = Object.keys(manifest.layers);
@@ -83,10 +95,10 @@
     host.parentElement.appendChild(veil);
     const m = L.map(id, { maxZoom: 23, minZoom: 15, zoomSnap: 0.25, zoomControl: false });
     L.control.zoom({ position: "bottomright" }).addTo(m);
-    const ov = L.imageOverlay("/data/ortho_3857.png", ortho.bounds_latlon).addTo(m);
+    const ov = L.imageOverlay(orthoUrl, orthoBounds).addTo(m);
     ov.on("load", () => veil.remove());
     ov.on("error", () => { veil.textContent = "Orthophoto failed to load"; });
-    m.fitBounds(ortho.bounds_latlon);
+    m.fitBounds(orthoBounds);
     L.control.scale({ metric: true, imperial: false, position: "bottomright" }).addTo(m);
     return m;
   }
@@ -153,7 +165,7 @@
     document.querySelectorAll(".layer-item").forEach((el) => el.classList.toggle("active", el.querySelector("input").value === k));
     leftLayer = candidateLayer(k, mapL, false).addTo(mapL);
     $("label-left").textContent = `${k} · ${shortName(k)}`;
-    renderMapLegends();
+    renderMapLegends(); scheduleTopology();
   }
   function renderRightCandidate() {
     if (rightCand) mapR.removeLayer(rightCand);
@@ -162,7 +174,7 @@
     if (k) rightCand = candidateLayer(k, mapR, true).addTo(mapR);
     if (wsLayer) wsLayer.bringToFront();
     $("label-right").textContent = k ? `candidates: ${k} · ${shortName(k)}` : "workspace only";
-    renderMapLegends(); updateButtons(); updateCounts();
+    renderMapLegends(); updateButtons(); updateCounts(); scheduleTopology();
   }
   function renderWindows() {
     if (windowsLayer) mapL.removeLayer(windowsLayer);
@@ -214,7 +226,7 @@
       },
     }).addTo(mapR);
     if (changed !== false) save();
-    updateCounts(); updateButtons();
+    updateCounts(); updateButtons(); scheduleTopology();
   }
   function markChanged() { dirty = true; }
   const selFeatures = () => ws.filter((f) => selected.has(f.id));
@@ -318,7 +330,10 @@
     const sel = need(1); if (!sel) return;
     if (sel.length !== 1) return status("Select exactly one polygon to edit.", "warn");
     editing = sel[0].id;
-    layerById.get(editing).pm.enable({ allowSelfIntersection: false });
+    const editLayer = layerById.get(editing), editId = editing;
+    editLayer.off("pm:markerdragstart");
+    editLayer.on("pm:markerdragstart", (ev) => flashSharedEdge(editId, ev.markerEvent.target.getLatLng()));
+    editLayer.pm.enable({ allowSelfIntersection: false });
     setMode("edit", "Editing — drag vertices");
   };
   $("btn-draw").onclick = () => {
@@ -368,6 +383,74 @@
     const sc = $("sel-count"); sc.textContent = n ? `${n} selected` : "0 selected"; sc.classList.toggle("on", n > 0);
   }
 
+  // ---------- topology conflicts (backend /api/topology/*; real Shapely checks, not simulated) ----------
+  const CONFLICT_STYLE = { warning: "#f5b544", error: "#f87171" };
+  const topoLayers = [];
+  let topoSeq = 0, topoTimer = null, lastEdgeFlash = null;
+  const topoToggle = $("show-topology");
+  async function postJSON(url, body) {
+    const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || "HTTP " + r.status);
+    return j;
+  }
+  function drawConflicts(map, result) {
+    const feats = result.conflicts.filter((c) => c.geometry).map((c) => ({ type: "Feature", geometry: c.geometry, properties: c }));
+    const g = L.geoJSON({ type: "FeatureCollection", features: feats }, {
+      style: (f) => { const c = CONFLICT_STYLE[f.properties.severity]; return { color: c, fillColor: c, weight: 2.5, fillOpacity: 0.3, className: "conflict-pulse" }; },
+      pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 7, color: CONFLICT_STYLE.error, fillColor: CONFLICT_STYLE.error, fillOpacity: 0.4, className: "conflict-pulse" }),
+      onEachFeature: (f, lyr) => lyr.bindTooltip(`${f.properties.severity}: ${f.properties.message} (${f.properties.features.join(", ")})`),
+    }).addTo(map);
+    topoLayers.push({ map, layer: g });
+  }
+  function clearConflicts() { topoLayers.splice(0).forEach((t) => t.map.removeLayer(t.layer)); }
+  function scheduleTopology() {
+    clearTimeout(topoTimer);
+    topoTimer = setTimeout(renderTopology, 250);
+  }
+  async function renderTopology() {
+    const seq = ++topoSeq;
+    clearConflicts();
+    const note = $("topology-note");
+    if (!topoToggle.checked) { note.textContent = ""; return; }
+    if (!api) { note.textContent = "Topology validation unavailable: the FastAPI backend is not running (see docs/backend.md)."; return; }
+    note.textContent = "Checking topology…";
+    try {
+      const parts = [];
+      const kL = (document.querySelector('input[name="cmp"]:checked') || {}).value;
+      if (kL && layerId(kL)) parts.push(["left " + kL, mapL, await postJSON("/api/topology/validate-layer", { site_id: api.site.id, layer_id: layerId(kL) })]);
+      const kR = $("review-candidate").value;
+      if (kR && layerId(kR)) parts.push(["right " + kR, mapR, await postJSON("/api/topology/validate-layer", { site_id: api.site.id, layer_id: layerId(kR) })]);
+      const live = EditOps.exportCollection(ws, ["suggested", "accepted"]);
+      if (live.features.length) parts.push(["workspace", mapR, await postJSON("/api/topology/validate", { features: live })]);
+      if (seq !== topoSeq) return;                     // a newer request superseded this one
+      const lines = [];
+      parts.forEach(([name, map, res]) => {
+        drawConflicts(map, res);
+        lines.push(res.valid ? `${name}: no conflicts (${res.summary.feature_count} footprints, ${res.summary.shared_boundary_count} shared edges)`
+          : `${name}: ${res.summary.conflict_count} conflict(s) — ` + Object.entries(res.summary.by_type).map(([t, n]) => n + " " + t.replace("_", " ")).join(", "));
+      });
+      note.textContent = lines.join(" · ") + ". Footprint relationships only — not cadastral topology.";
+    } catch (e) { if (seq === topoSeq) note.textContent = "Topology validation failed: " + e.message; }
+  }
+  topoToggle.addEventListener("change", renderTopology);
+  if (!api) { topoToggle.disabled = true; $("topology-note").textContent = "Topology validation unavailable (FastAPI backend not running)."; }
+
+  // Shared-boundary edit cue: dragging a vertex asks the backend which neighbour shares that edge and flashes it ~200 ms.
+  const EDGE_FLASH_MS = 200;
+  async function flashSharedEdge(featureId, latlng) {
+    if (!api) return;
+    try {
+      const live = EditOps.exportCollection(ws, ["suggested", "accepted"]);
+      live.features.forEach((f) => { f.id = f.properties.workspace_id; });
+      const r = await postJSON("/api/topology/shared-boundary", { feature_id: featureId, vertex: [latlng.lng, latlng.lat], features: live });
+      if (!r.shared) return;
+      const edge = L.geoJSON(r.edge, { style: { color: COLORS.cue, weight: 6, opacity: 0.95, className: "edge-flash" }, interactive: false }).addTo(mapR);
+      setTimeout(() => mapR.removeLayer(edge), EDGE_FLASH_MS);
+      lastEdgeFlash = { neighbor: r.neighbor_feature_id, at: Date.now() };
+    } catch (e) { /* the cue is best-effort; editing continues */ }
+  }
+
   // ---------- export ----------
   const exportStatuses = () => Array.from(document.querySelectorAll(".exp-status:checked")).map((c) => c.value);
   document.querySelectorAll(".exp-status").forEach((c) => c.addEventListener("change", updateButtons));
@@ -380,7 +463,12 @@
     try {
       const r = await fetch("/api/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ features: fc, note: "exported from review app" }) });
       const j = await r.json();
-      if (!r.ok) throw new Error((j.error || r.status) + (j.details ? "\n" + j.details.join("\n") : ""));
+      if (!r.ok) {
+        const er = j.error;   // legacy server: {"error": str, "details": [str]}; FastAPI backend: {"error": {code, message, details}}
+        const obj = er && typeof er === "object";
+        const det = obj ? (er.details && er.details.errors ? er.details.errors.map((x) => `feature ${x.feature_index}: ${x.message}`) : []) : (j.details || []);
+        throw new Error((obj ? `${er.code}: ${er.message}` : er || r.status) + (det.length ? "\n" + det.join("\n") : ""));
+      }
       out.className = "result ok";
       out.textContent = `Exported ${j.feature_count} footprints (${j.total_area_m2} m²)\n${j.dir}\n• ${j.files.analysis_crs.file} (${j.files.analysis_crs.crs})\n• ${j.files.wgs84.file}\nBuilding footprints only — not cadastral boundaries.`;
       dirty = false; status(`Exported ${j.feature_count} footprints.`);
@@ -524,5 +612,5 @@
   // ---------- start ----------
   renderLeft(); renderRightCandidate(); renderWorkspace(false); renderMetrics(); clearInfo();
   status(`Loaded ${keys.map((k) => k + "=" + manifest.layers[k].count).join(", ")} · workspace ${ws.length}`);
-  window.__app = { mapL, mapR, get ws() { return ws; }, toggleEval };  // for automated checks
+  window.__app = { mapL, mapR, get ws() { return ws; }, toggleEval, get api() { return api; }, renderTopology, get lastEdgeFlash() { return lastEdgeFlash; } };  // for automated checks
 })();

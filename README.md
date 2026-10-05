@@ -245,3 +245,6 @@ Outputs are AI-assisted building footprints intended for human review. They must
 cadastral parcel boundaries, as evidence of property ownership, or for decisions about individuals' property
 without verification against authoritative records and qualified surveyors. Reported accuracy applies only to
 the small evaluation sample described above.
+
+## Backend (FastAPI)
+See `docs/backend.md`: `.venv\Scripts\python -m uvicorn backend.main:app --port 8765` serves the UI plus topology validation, review workspace and validated export APIs (`/docs`).
