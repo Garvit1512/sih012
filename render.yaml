@@ -1,0 +1,17 @@
+# Free synthetic demo: edits are temporary. For durable storage see docs/DEPLOYMENT.md.
+services:
+  - type: web
+    name: sih012-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: SIH_STORAGE_DIR
+        value: /tmp/sih
+      - key: SIH_SEED_DEMO
+        value: "1"
+      - key: SIH_STORAGE_TEMPORARY
+        value: "1"
+      - key: SIH_APP_PASSWORD
+        generateValue: true

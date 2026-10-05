@@ -778,5 +778,6 @@
   await loadViewport();
   status(`Loaded ${keys.map((k) => k + "=" + manifest.layers[k].count).join(", ")} · workspace ${ws.length}`);
   window.__app = { mapL, mapR, get ws() { return ws; }, get revision() { return workspace?.revision; }, get saving() { return saving; }, toggleEval, get api() { return api; }, renderTopology, get lastEdgeFlash() { return lastEdgeFlash; } };  // for automated checks
+  if (api) window.dispatchEvent(new CustomEvent("sih-ready", { detail: { siteId: api.site.id, mapL, mapR } }));
   if (api) window.dispatchEvent(new CustomEvent("site-ready", { detail: api.site }));
 })();

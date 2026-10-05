@@ -11,5 +11,6 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-app.txt
       - run: python -m pip install -r requirements-app.txt
-      - run: python -m pytest tests/test_site_workflow.py tests/test_jobs.py tests/test_use_review.py tests/test_use_experiment.py -q
+      - run: python -m pytest tests/test_site_workflow.py tests/test_jobs.py tests/test_use_review.py tests/test_use_experiment.py tests/test_uavpal.py tests/test_parcels.py tests/test_hosting.py -q
+      - run: python -m backend.smoke
       - run: python -m compileall -q backend

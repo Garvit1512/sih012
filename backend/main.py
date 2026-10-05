@@ -18,9 +18,10 @@ from fastapi.staticfiles import StaticFiles
 
 from . import errors
 from .config import Settings
-from .routers import export, jobs, layers, review, sites, topology
+from .routers import export, jobs, layers, parcels, review, sites, topology
 from .services.job_service import JobManager
 from .services.review_service import WorkspaceStore
+from .services.parcel_service import ParcelStore
 from .services.site_service import SiteRegistry
 
 mimetypes.add_type("application/geo+json", ".geojson")
@@ -63,6 +64,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return workspaces[site_id]
 
     app.state.workspace_for = workspace_for
+    parcel_workspaces = {}
+
+    def parcels_for(site_id):
+        cat = catalog.get(site_id)
+        with workspace_lock:
+            if site_id not in parcel_workspaces:
+                parcel_workspaces[site_id] = ParcelStore(settings.workspace_dir, None, cat.bounds()[0], site_id,
+                                                       cat.analysis_crs, True)
+            return parcel_workspaces[site_id]
+
+    app.state.parcels_for = parcels_for
 
     @app.get("/api/health", tags=["health"], summary="Health check")
     def health(request: Request) -> dict:
@@ -70,7 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"ok": True, "backend": "fastapi", "data_ready": c.ready, "site_id": c.site_id,
                 "site_count": len(c.all()), "storage_mode": "single-process local writer"}
 
-    for r in (sites.router, layers.router, topology.router, review.router, export.router, jobs.router):
+    for r in (sites.router, layers.router, topology.router, review.router, export.router, jobs.router, parcels.router):
         app.include_router(r)
 
     # Existing single-page UI + display data bundle (read-only, StaticFiles blocks path traversal).

@@ -66,3 +66,7 @@ outputs/sites/
 outputs/jobs/
 outputs/experiments/
 outputs/datasets/
+/work/
+
+.vercel/
+models/local/

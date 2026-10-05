@@ -4,8 +4,36 @@ window.siteSetup = (async function () {
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   let response;
   try { response = await fetch("/api/sites"); } catch (_) { return null; }
+  if (response.status === 401) {
+    const overlay = document.createElement("div");
+    overlay.className = "workspace-login";
+    overlay.innerHTML = '<form><h2>Review workspace sign-in</h2><p>Enter the workspace password supplied by the deployment owner.</p><label>Password<input type="password" autocomplete="current-password" required></label><button class="btn" type="submit">Sign in</button><p role="status" aria-live="polite"></p></form>';
+    document.body.append(overlay);
+    await new Promise((resolve) => {
+      const form = overlay.querySelector("form"), input = form.querySelector("input"), note = form.querySelector('[role="status"]'), button = form.querySelector("button");
+      input.focus();
+      form.onsubmit = async (event) => {
+        event.preventDefault(); button.disabled = true; note.textContent = "Signing in…";
+        try {
+          const result = await fetch("/api/auth/login", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({password: input.value}) });
+          if (!result.ok) throw new Error("Sign-in failed. Check the password and try again.");
+          input.value = ""; overlay.remove(); resolve();
+        } catch (error) { note.textContent = error.message; button.disabled = false; }
+      };
+    });
+    response = await fetch("/api/sites");
+  }
   if (response.status === 404) return null; // legacy app/server.py
   if (!response.ok) throw new Error("Site catalog unavailable (HTTP " + response.status + ")");
+  try {
+    const health = await (await fetch("/api/health")).json();
+    if (health.deployment?.temporary_storage) {
+      const notice = document.createElement("div");
+      notice.className = "deployment-notice";
+      notice.textContent = "Temporary hosted demo · edits and uploads reset when the backend restarts. Export your work before leaving.";
+      document.querySelector("#site-controls summary").after(notice);
+    }
+  } catch (_) { /* The health chip reports connection failures separately. */ }
   const { sites } = await response.json();
   $("site-controls").hidden = false;
   const requested = new URL(location.href).searchParams.get("site");

@@ -254,3 +254,13 @@ path.edge-flash { stroke-linecap: round; filter: drop-shadow(0 0 4px #fb7185); }
 .job-item pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow: auto; font-size: 11px; }
 [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } path.conflict-pulse { animation: none; } }
+
+#parcel-controls label { display: grid; gap: 4px; margin: 8px 0; color: var(--ink-3); font-size: var(--fs-sm); }
+#parcel-controls input, #parcel-controls textarea { width: 100%; min-width: 0; padding: 7px; color: var(--ink); background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--radius-sm); font: inherit; }
+#parcel-controls textarea { resize: vertical; }
+#parcel-controls label.check { display: flex; align-items: start; }
+#parcel-controls input[type=checkbox] { width: auto; margin-top: 3px; }
+#parcel-controls .btn { margin: 6px 0; }
+#parcel-result { overflow-wrap: anywhere; }
+
+.workspace-login{position:fixed;inset:0;z-index:10000;background:#080d14ed;display:grid;place-items:center}.workspace-login form{width:min(420px,90vw);padding:28px;background:#111b29;border:1px solid #334155;border-radius:10px}.workspace-login input{width:100%;margin:12px 0}.deployment-notice{padding:10px;margin-bottom:12px;color:#f5b544;border:1px solid #695323;border-radius:6px;font-size:12px}

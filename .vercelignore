@@ -1,0 +1,16 @@
+.git/
+.venv/
+outputs/
+models/
+data/
+scripts/
+backend/
+tests/
+docs/
+work/
+app/data*/
+app/*.py
+.env*
+*.pem
+*.key
+*.log

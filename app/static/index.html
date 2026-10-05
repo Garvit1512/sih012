@@ -183,6 +183,40 @@
       </form>
     </details>
 
+    <details class="section" id="parcel-controls" hidden>
+      <summary><span>Parcel proposals &amp; field evidence</span><svg class="chev"><use href="#i-chev"/></svg></summary>
+      <p class="help">Preliminary parcels need supported boundary lines. Reference parcels, observations and roofs remain distinct. Field checked records local evidence review, not legal certification.</p>
+      <p id="parcel-summary" class="small"></p>
+      <form id="parcel-import-form">
+        <label>Evidence type<select id="parcel-kind"><option value="boundary_segment">Boundary lines</option><option value="reference_parcel">Reference parcels</option><option value="survey_observation">Observation for selected parcel</option><option value="excluded_area">Excluded road/water area</option><option value="survey_extent">Survey extent</option></select></label>
+        <label>GeoJSON evidence<input type="file" id="parcel-file" accept=".json,.geojson" required></label>
+        <label>Evidence CRS<input id="parcel-crs" value="EPSG:4326" required></label>
+        <label>Source / record reference<input id="parcel-source" required maxlength="500"></label>
+        <label>Capture / observation date<input id="parcel-date" type="date" required></label>
+        <label>Horizontal datum<input id="parcel-datum" placeholder="e.g. WGS84" required></label>
+        <label>Reported accuracy (metres)<input id="parcel-accuracy" type="number" min="0.001" max="100" step="0.001"></label>
+        <label>Observation method<select id="parcel-method"><option value="record">Supplied record</option><option value="visible_boundary">Visible boundary</option><option value="gnss">GNSS</option><option value="ets">ETS</option><option value="photo">Photo reference</option></select></label>
+        <label class="check"><input type="checkbox" id="parcel-reviewed"> I reviewed this evidence's alignment and source</label>
+        <button class="btn" type="submit">Import evidence</button>
+      </form>
+      <label>Proposal mode<select id="parcel-mode"><option value="visible_boundaries">Visible boundary proposals</option><option value="reference_reconciliation">Compare against reference parcels</option></select></label>
+      <button class="btn" id="parcel-propose">Generate supported parcels</button>
+      <label>Parcel<select id="parcel-selected"></select></label>
+      <p id="parcel-selection-info" class="small"></p>
+      <label>Parcel state<select id="parcel-state"><option value="proposed">Proposed</option><option value="reviewed">Reviewed</option><option value="field_checked">Field checked</option><option value="needs_survey">Needs survey</option><option value="disputed">Disputed</option></select></label>
+      <label>Record / observation references<textarea id="parcel-records" rows="2" placeholder="One source reference per line"></textarea></label>
+      <label>Reason / unresolved boundary<input id="parcel-reason" maxlength="500"></label>
+      <button class="btn" id="parcel-state-save">Save parcel state</button>
+      <details><summary>Edit a shared edge</summary>
+        <label>Neighbour parcel<select id="parcel-neighbour"></select></label>
+        <label>Replacement GeoJSON LineString<textarea id="parcel-edge" rows="3" placeholder='{"type":"LineString","coordinates":[...]}'></textarea></label>
+        <p class="help">Use the evidence CRS above and keep the edge endpoints fixed. Both parcels save together; field checks become stale.</p>
+        <button class="btn" id="parcel-shared-save">Save shared edge</button>
+      </details>
+      <button class="btn" id="parcel-export">Export saved parcel revision</button>
+      <p id="parcel-result" class="help" role="status" aria-live="polite"></p>
+    </details>
+
     <details class="section">
       <summary><span>Known failure modes</span><svg class="chev"><use href="#i-chev"/></svg></summary>
       <ul id="failure-modes" class="notes"></ul>
@@ -240,6 +274,7 @@
 <script src="/static/sites.js"></script>
 <script src="/static/workspace_client.js"></script>
 <script src="/static/jobs.js"></script>
+<script src="/static/parcels.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

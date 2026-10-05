@@ -253,3 +253,11 @@ the small evaluation sample described above.
 
 ## Backend (FastAPI)
 See `docs/backend.md`: `.venv\Scripts\python -m uvicorn backend.main:app --port 8765` serves the UI plus topology validation, review workspace and validated export APIs (`/docs`).
+
+## Minimum parcel demo (Phases 4–5)
+
+The local application now supports evidence-backed preliminary parcel proposals, field-evidence states, shared-edge correction and saved-revision GIS ZIP exports. Run `python -m backend.smoke`, then `python -m backend.demo build work/minimum-demo` and `python -m backend.demo serve work/minimum-demo --port 8776`. The demo uses labelled synthetic fixtures. See [the short demo guide](docs/MINIMUM_DEMO.md) for the workflow and explicitly deferred validation.
+
+## Hosted demo
+
+The [deployment guide](docs/DEPLOYMENT.md) configures the Vercel frontend and a password-protected Render backend. The free Render demo uses synthetic imagery and temporary storage; export work before a restart. Persistent review and model inference need separately provisioned storage/runtime resources. Cloud deployment does not establish model or cadastral accuracy.
