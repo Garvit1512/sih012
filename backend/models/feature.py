@@ -8,7 +8,7 @@ class FeatureCollectionOut(BaseModel):
     numberReturned: int
     offset: int
     limit: int
-    crs_note: str = "Coordinates are WGS84 lon/lat (EPSG:4326); area_m2 is computed in EPSG:32719."
+    crs_note: str = "Coordinates are WGS84 lon/lat (EPSG:4326); area_m2 uses the site's metric analysis CRS."
 
 
 class Relationship(BaseModel):

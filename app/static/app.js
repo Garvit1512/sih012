@@ -1,6 +1,6 @@
 /* Footprint Intelligence — review app.
  * AI layers are read-only; all human work lives in the workspace array (EditOps copies with provenance).
- * Geometry, CRS and export logic are unchanged from v1; this file adds UI state on top.
+ * FastAPI is the source of truth; the legacy data-bundle server retains its local fallback.
  */
 (async function () {
   "use strict";
@@ -46,27 +46,31 @@
   // ---------- load ----------
   chip("hdr-conn", "Loading data…", "busy");
   let manifest, ortho, windows;
+  let api = null;
   const layersData = {};
   try {
-    manifest = await getJSON("/data/manifest.json");
-    ortho = await getJSON("/data/ortho.json");
-    windows = await getJSON("/data/windows.geojson");
-    for (const k of Object.keys(manifest.layers)) layersData[k] = await getJSON("/data/" + manifest.layers[k].file);
+    const setup = await window.siteSetup;
+    if (setup && !setup.siteId) return;
+    if (setup) {
+      const root = "/api/sites/" + encodeURIComponent(setup.siteId);
+      const site = await getJSON(root);
+      api = { site, layers: (await getJSON(root + "/layers")).layers };
+      manifest = await getJSON(root + "/manifest");
+      windows = await getJSON(root + "/windows");
+      ortho = manifest.ortho;
+      for (const k of Object.keys(manifest.layers)) layersData[k] = { type: "FeatureCollection", features: [] };
+    } else {
+      manifest = await getJSON("/data/manifest.json");
+      ortho = await getJSON("/data/ortho.json");
+      windows = await getJSON("/data/windows.geojson");
+      for (const k of Object.keys(manifest.layers)) layersData[k] = await getJSON("/data/" + manifest.layers[k].file);
+    }
   } catch (e) {
     chip("hdr-conn", "Data unavailable", "err");
     status("Failed to load data: " + e.message + " — run scripts/build_app_data.py and restart the server.", "error");
     $("project-info").innerHTML = `<dt>Status</dt><dd>Data not loaded</dd>`;
     return;
   }
-  // Optional FastAPI backend (backend/main.py). Without it the app runs exactly as before from /data (offline fallback).
-  let api = null;
-  try {
-    const sites = await getJSON("/api/sites");
-    if (sites.sites && sites.sites.length) {
-      const site = await getJSON("/api/sites/" + sites.sites[0].id);
-      api = { site, layers: (await getJSON(`/api/sites/${site.id}/layers`)).layers };
-    }
-  } catch (e) { api = null; }
   const orthoUrl = api ? api.site.imagery_info.display_url : "/data/ortho_3857.png";
   const orthoBounds = api ? api.site.imagery_info.display_bounds_latlon : ortho.bounds_latlon;
   const layerId = (k) => { const l = api && api.layers.find((x) => x.legacy_key === k); return l ? l.id : null; };
@@ -75,15 +79,18 @@
 
   const keys = Object.keys(manifest.layers);
   const img = manifest.imagery || {};
-  $("hdr-context").textContent = `La Paz, Bolivia · ${img.file || "orthophoto"}${img.native_res_m ? " · " + img.native_res_m * 100 + " cm GSD" : ""} · ${manifest.analysis_crs}`;
+  $("hdr-context").textContent = `${api ? api.site.name : "La Paz, Bolivia"} · ${img.file || "orthophoto"}${img.native_res_m ? " · " + img.native_res_m * 100 + " cm GSD" : ""} · ${manifest.analysis_crs}`;
+  $("btn-export-top").title = "Export reviewed features in " + manifest.analysis_crs + " and WGS84";
   const kv = [
-    ["Location", "La Paz, Bolivia"],
+    ["Site", api ? api.site.name : "La Paz, Bolivia"],
     ["Imagery", img.file || "n/a"],
     ["Source", img.software ? "Drone orthomosaic (" + img.software + ")" : "Drone orthomosaic"],
     ["Native GSD", img.native_res_m ? img.native_res_m + " m" : "n/a"],
     ["Extent", img.extent_m ? `${img.extent_m[0]} × ${img.extent_m[1]} m` : "n/a"],
     ["Analysis CRS", manifest.analysis_crs],
     ["Layers", keys.map((k) => `${k} ${manifest.layers[k].count}`).join(" · ")],
+    ["Accuracy", manifest.quality?.absolute_accuracy || "See source evaluation"],
+    ["Quality flags", (manifest.quality?.flags || []).join(", ") || "No additional flags recorded"],
   ];
   $("project-info").innerHTML = kv.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("");
 
@@ -93,9 +100,11 @@
     const veil = document.createElement("div");
     veil.className = "loading-veil"; veil.textContent = "Loading orthophoto…";
     host.parentElement.appendChild(veil);
-    const m = L.map(id, { maxZoom: 23, minZoom: 15, zoomSnap: 0.25, zoomControl: false });
+    const m = L.map(id, { maxZoom: 24, minZoom: 1, zoomSnap: 0.25, zoomControl: false });
     L.control.zoom({ position: "bottomright" }).addTo(m);
-    const ov = L.imageOverlay(orthoUrl, orthoBounds).addTo(m);
+    const ov = api?.site.imagery_info.tile_url
+      ? L.tileLayer(api.site.imagery_info.tile_url, { maxZoom: 24, bounds: orthoBounds, noWrap: true }).addTo(m)
+      : L.imageOverlay(orthoUrl, orthoBounds).addTo(m);
     ov.on("load", () => veil.remove());
     ov.on("error", () => { veil.textContent = "Orthophoto failed to load"; });
     m.fitBounds(orthoBounds);
@@ -161,7 +170,8 @@
     keys.map((k) => `<option value="${k}" ${k === "C" ? "selected" : ""}>${k} · ${esc(shortName(k))}</option>`).join("") + `<option value="">None (workspace only)</option>`;
   function renderLeft() {
     if (leftLayer) mapL.removeLayer(leftLayer);
-    const k = document.querySelector('input[name="cmp"]:checked').value;
+    const k = document.querySelector('input[name="cmp"]:checked')?.value;
+    if (!k) { $("label-left").textContent = "Imagery · no AI layers yet"; return; }
     document.querySelectorAll(".layer-item").forEach((el) => el.classList.toggle("active", el.querySelector("input").value === k));
     leftLayer = candidateLayer(k, mapL, false).addTo(mapL);
     $("label-left").textContent = `${k} · ${shortName(k)}`;
@@ -187,20 +197,32 @@
     }
     renderMapLegends();
   }
-  document.querySelectorAll('input[name="cmp"]').forEach((r) => r.addEventListener("change", renderLeft));
-  $("review-candidate").addEventListener("change", renderRightCandidate);
+  document.querySelectorAll('input[name="cmp"]').forEach((r) => r.addEventListener("change", () => { renderLeft(); scheduleViewport(); }));
+  $("review-candidate").addEventListener("change", () => { renderRightCandidate(); scheduleViewport(); });
   $("show-windows").addEventListener("change", renderWindows);
   $("show-flags").addEventListener("change", () => { renderLeft(); renderRightCandidate(); });
 
   // ---------- workspace ----------
   let ws = [];
   let storageOk = true;
-  try { ws = JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); } catch (e) { ws = []; storageOk = false; }
+  const workspace = api ? new WorkspaceClient(api.site.id) : null;
+  if (workspace) {
+    try { ws = (await workspace.load()).features; }
+    catch (e) { status("Workspace load failed: " + e.message, "error"); return; }
+    $("review-context").hidden = false;
+    $("draw-context").hidden = false;
+    $("export-revision-field").hidden = false;
+  } else {
+    try { ws = JSON.parse(localStorage.getItem(STORE_KEY) || "[]"); } catch (e) { ws = []; storageOk = false; }
+  }
+  let saving = false, exporting = false, reviewStarted = Date.now();
   let dirty = false;           // workspace changed since last successful export
   let selected = new Set();
+  let inspectedWorkspaceId = null;
   let wsLayer = null;
   const layerById = new Map();
   function save() {
+    if (workspace) return;
     try { localStorage.setItem(STORE_KEY, JSON.stringify(ws)); storageOk = true; } catch (e) { storageOk = false; }
   }
   function renderWorkspace(changed) {
@@ -220,6 +242,7 @@
           if (mode) return;   // ignore selection changes while a tool is active
           if (ev.originalEvent.shiftKey) selected.has(f.id) ? selected.delete(f.id) : selected.add(f.id);
           else selected = new Set([f.id]);
+          reviewStarted = Date.now();
           renderWorkspace();
           showInfo(f, "ws");
         });
@@ -241,11 +264,33 @@
     if (s.length < n) { status(`Select ${n === 1 ? "a workspace polygon" : "at least " + n + " workspace polygons"} first.`, "warn"); return null; }
     return s;
   }
-  const inWorkspace = (f) => ws.some((w) => w.properties.source_layer === f.properties.layer && w.properties.source_id === f.properties.source_id);
+  const inWorkspace = (f) => ws.some((w) => workspace ? w.properties.source_feature_id === f.id : w.properties.source_layer === f.properties.layer && w.properties.source_id === f.properties.source_id);
+
+  async function savedChange(actions, message) {
+    if (saving) return;
+    saving = true; updateButtons();
+    const context = { actor: $("review-actor").value || "local-reviewer", reason: $("review-reason").value,
+      duration_ms: Math.min(86400000, Date.now() - reviewStarted) };
+    try {
+      for (const [path, body] of actions) {
+        const result = await workspace.change(path, body, context);
+        context.duration_ms = 0; // one elapsed interval per user action
+        const ids = [...result.removed_ids, ...result.features.map((f) => f.id)];
+        ws = ws.filter((f) => !ids.includes(f.id)).concat(result.features);
+        selected = new Set(result.features.map((f) => f.id));
+      }
+      reviewStarted = Date.now(); dirty = false;
+      renderWorkspace(false); showInfo(selFeatures()[0], "ws"); status(message);
+    } catch (e) {
+      try { ws = (await workspace.load()).features; selected.clear(); renderWorkspace(false); } catch (_) { storageOk = false; }
+      status("Change failed: " + e.message + (e.code === "STALE_REVISION" ? " Current server revision reloaded; review it before retrying." : ""), "error");
+    } finally { saving = false; updateButtons(); }
+  }
 
   $("btn-add-selected").onclick = () => {
     if (!selectedCandidate) return status("Click an AI polygon on the right map first.", "warn");
     if (inWorkspace(selectedCandidate)) return status("That AI polygon is already in the workspace.", "warn");
+    if (workspace) return savedChange([["workspace", { layer_id: layerId(selectedCandidate.properties.layer), feature_ids: [selectedCandidate.id] }]], "AI feature saved as suggested.");
     const f = EditOps.fromCandidate(selectedCandidate);
     ws.push(f); selected = new Set([f.id]); markChanged(); renderWorkspace(); showInfo(f, "ws");
     status("Added AI polygon to the workspace as 'suggested'.");
@@ -254,6 +299,7 @@
     const k = $("review-candidate").value;
     if (!k) return status("Choose a candidate layer first.", "warn");
     const b = mapR.getBounds();
+    if (workspace) return savedChange([["workspace", { layer_id: layerId(k), bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()] }]], "Visible AI features saved as suggested.");
     let n = 0;
     layersData[k].features.forEach((f) => {
       const c = turf.centroid(f).geometry.coordinates;
@@ -264,6 +310,7 @@
   };
   function setStatus(s) {
     const sel = need(1); if (!sel) return;
+    if (workspace) return savedChange(sel.map((f) => ["features/" + f.id + "/" + {accepted:"accept",rejected:"reject",suggested:"reset"}[s], {}]), `${sel.length} feature(s) saved as ${s}.`);
     ws = ws.map((f) => (selected.has(f.id) ? EditOps.setStatus(f, s) : f));
     markChanged(); renderWorkspace();
     if (sel.length === 1) showInfo(ws.find((f) => f.id === sel[0].id), "ws");
@@ -274,10 +321,12 @@
   $("btn-reset").onclick = () => setStatus("suggested");
   $("btn-remove").onclick = () => {
     const sel = need(1); if (!sel) return;
+    if (workspace) return savedChange(sel.map((f) => ["features/" + f.id + "/remove", {}]), "Removed workspace copies.");
     replace(sel.map((f) => f.id), []); status(`Removed ${sel.length} polygon(s) from the workspace. AI layers are unchanged.`);
   };
   $("btn-merge").onclick = () => {
     const sel = need(2); if (!sel) return;
+    if (workspace) return savedChange([["features/merge", { feature_ids: sel.map((f) => f.id) }]], "Merged geometry saved; review it before accepting.");
     try {
       const m = EditOps.merge(sel, turf);
       replace(sel.map((f) => f.id), [m]); status(`Merged ${sel.length} polygons (origin: human_merged).`);
@@ -320,6 +369,10 @@
       const gj = lyr.toGeoJSON();
       lyr.pm.disable();
       const id = editing;
+      if (workspace) {
+        editing = null; setMode(null);
+        return savedChange([["features/" + id + "/edit", { geometry: gj.geometry }]], "Geometry saved as suggested; review it before accepting.");
+      }
       try {
         ws = ws.map((f) => (f.id === id ? EditOps.withEditedGeometry(f, gj.geometry) : f));
         editing = null; setMode(null); markChanged(); renderWorkspace();
@@ -353,6 +406,12 @@
     mapR.removeLayer(e.layer);
     mapR.pm.disableDraw();
     const m = mode;
+    if (workspace) {
+      const actions = m === "draw" ? [["features/draw", { geometry: gj.geometry, review_status: "suggested", feature_type: $("draw-type").value, class_name: $("draw-class").value || null }]]
+        : [["features/" + selFeatures()[0].id + "/split", { line: gj.geometry }]];
+      setMode(null);
+      return savedChange(actions, "Geometry saved as suggested; review it before accepting.");
+    }
     try {
       if (m === "draw") {
         const f = EditOps.drawn(gj.geometry);
@@ -369,18 +428,32 @@
 
   // ---------- button state ----------
   function updateButtons() {
-    const n = selected.size, busy = !!mode;
+    const n = selected.size, busy = !!mode || saving || exporting;
     const set = (id, on) => { $(id).disabled = !on; };
     set("btn-add-selected", !busy && !!selectedCandidate && !inWorkspace(selectedCandidate));
     set("btn-add-view", !busy && !!$("review-candidate").value);
     ["btn-accept", "btn-reject", "btn-reset", "btn-remove"].forEach((id) => set(id, !busy && n >= 1));
+    const useEditable = !!workspace && n === 1 && selFeatures()[0]?.id === inspectedWorkspaceId && (selFeatures()[0]?.properties.feature_type || "building_footprint") === "building_footprint";
+    $("use-review").hidden = !useEditable;
+    ["use-label", "use-evidence", "btn-use-save"].forEach((id) => set(id, !busy && useEditable));
     set("btn-merge", !busy && n >= 2);
     set("btn-edit", mode === "edit" || (!busy && n === 1));
     set("btn-draw", mode === "draw" || !busy);
     set("btn-split", mode === "split" || (!busy && n === 1));
-    const exportable = EditOps.exportCollection(ws, exportStatuses()).features.length > 0;
+    if (workspace) {
+      $("export-revision").max = workspace.revision;
+      if ($("export-revision").dataset.auto === "true") $("export-revision").value = workspace.revision;
+    }
+    const chosenRevision = workspace ? Number($("export-revision").value) : null;
+    const exportable = workspace ? Number.isInteger(chosenRevision) && chosenRevision >= 0 && chosenRevision <= workspace.revision && (chosenRevision < workspace.revision || EditOps.exportCollection(ws, exportStatuses()).features.length > 0)
+      : EditOps.exportCollection(ws, exportStatuses()).features.length > 0;
     set("btn-export", !busy && exportable); set("btn-export-top", !busy && exportable); set("btn-download", !busy && exportable);
     const sc = $("sel-count"); sc.textContent = n ? `${n} selected` : "0 selected"; sc.classList.toggle("on", n > 0);
+    if (workspace) {
+      $("review-revision").textContent = `Saved revision ${workspace.revision} · ${ws.filter((f) => f.properties.review_status === "suggested").length} awaiting review`;
+      $("btn-next-review").disabled = busy;
+      $("btn-history").disabled = saving;
+    }
   }
 
   // ---------- topology conflicts (backend /api/topology/*; real Shapely checks, not simulated) ----------
@@ -422,7 +495,7 @@
       const kR = $("review-candidate").value;
       if (kR && layerId(kR)) parts.push(["right " + kR, mapR, await postJSON("/api/topology/validate-layer", { site_id: api.site.id, layer_id: layerId(kR) })]);
       const live = EditOps.exportCollection(ws, ["suggested", "accepted"]);
-      if (live.features.length) parts.push(["workspace", mapR, await postJSON("/api/topology/validate", { features: live })]);
+      if (live.features.length) parts.push(["workspace", mapR, await postJSON("/api/topology/validate", { site_id: api.site.id, features: live })]);
       if (seq !== topoSeq) return;                     // a newer request superseded this one
       const lines = [];
       parts.forEach(([name, map, res]) => {
@@ -443,7 +516,7 @@
     try {
       const live = EditOps.exportCollection(ws, ["suggested", "accepted"]);
       live.features.forEach((f) => { f.id = f.properties.workspace_id; });
-      const r = await postJSON("/api/topology/shared-boundary", { feature_id: featureId, vertex: [latlng.lng, latlng.lat], features: live });
+      const r = await postJSON("/api/topology/shared-boundary", { site_id: api.site.id, feature_id: featureId, vertex: [latlng.lng, latlng.lat], features: live });
       if (!r.shared) return;
       const edge = L.geoJSON(r.edge, { style: { color: COLORS.cue, weight: 6, opacity: 0.95, className: "edge-flash" }, interactive: false }).addTo(mapR);
       setTimeout(() => mapR.removeLayer(edge), EDGE_FLASH_MS);
@@ -454,14 +527,18 @@
   // ---------- export ----------
   const exportStatuses = () => Array.from(document.querySelectorAll(".exp-status:checked")).map((c) => c.value);
   document.querySelectorAll(".exp-status").forEach((c) => c.addEventListener("change", updateButtons));
+  $("export-revision").oninput = () => { $("export-revision").dataset.auto = "false"; updateButtons(); };
   $("btn-export").onclick = async () => {
+    if (exporting) return;
     const fc = EditOps.exportCollection(ws, exportStatuses());
+    const revision = workspace ? Number($("export-revision").value) : null;
     const out = $("export-result");
-    if (!fc.features.length) { out.className = "result error"; out.textContent = "Nothing to export for the chosen statuses."; return; }
+    if (!workspace && !fc.features.length) { out.className = "result error"; out.textContent = "Nothing to export for the chosen statuses."; return; }
     out.className = "result"; out.textContent = "";
-    $("btn-export").disabled = true; status("Exporting…");
+    exporting = true; updateButtons(); status("Exporting…");
     try {
-      const r = await fetch("/api/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ features: fc, note: "exported from review app" }) });
+      const body = workspace ? { site_id: api.site.id, revision, statuses: exportStatuses(), note: "exported from review app" } : { features: fc, note: "exported from review app" };
+      const r = await fetch("/api/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const j = await r.json();
       if (!r.ok) {
         const er = j.error;   // legacy server: {"error": str, "details": [str]}; FastAPI backend: {"error": {code, message, details}}
@@ -473,6 +550,7 @@
       out.textContent = `Exported ${j.feature_count} footprints (${j.total_area_m2} m²)\n${j.dir}\n• ${j.files.analysis_crs.file} (${j.files.analysis_crs.crs})\n• ${j.files.wgs84.file}\nBuilding footprints only — not cadastral boundaries.`;
       dirty = false; status(`Exported ${j.feature_count} footprints.`);
     } catch (e) { out.className = "result error"; out.textContent = "Export failed: " + e.message; status("Export failed — see Step 4.", "error"); }
+    exporting = false;
     updateButtons();
   };
   $("btn-export-top").onclick = () => {
@@ -480,8 +558,14 @@
     $("btn-export").scrollIntoView({ block: "center", behavior: "smooth" });
     $("btn-export").click();
   };
-  $("btn-download").onclick = () => {
-    const fc = EditOps.exportCollection(ws, exportStatuses());
+  $("btn-download").onclick = async () => {
+    let fc = EditOps.exportCollection(ws, exportStatuses());
+    if (workspace) {
+      try {
+        const saved = await getJSON(`/api/review/workspace?site_id=${api.site.id}&revision=${Number($("export-revision").value)}`);
+        fc = { ...saved, features: saved.features.filter((f) => exportStatuses().includes(f.properties.review_status)) };
+      } catch (e) { return status("Download failed: " + e.message, "error"); }
+    }
     const blob = new Blob([JSON.stringify(fc)], { type: "application/geo+json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = "building_footprints_reviewed_WGS84.geojson"; a.click();
@@ -489,24 +573,34 @@
     status("Downloaded WGS84 GeoJSON (client-side copy).");
   };
   window.addEventListener("beforeunload", (e) => {
-    if (mode === "edit" || (dirty && (!storageOk || ws.length))) { e.preventDefault(); e.returnValue = ""; }
+    if (saving || exporting || mode === "edit" || (!workspace && dirty && (!storageOk || ws.length))) { e.preventDefault(); e.returnValue = ""; }
   });
 
   // ---------- inspector ----------
-  function clearInfo() { $("info").innerHTML = `<p class="empty">Nothing selected. Click a polygon on either map.</p>`; }
+  function clearInfo() { $("info").innerHTML = `<p class="empty">Nothing selected. Click a polygon on either map.</p>`; inspectedWorkspaceId = null; $("use-review").hidden = true; }
   function showInfo(f, kind) {
     if (!f) return clearInfo();
+    inspectedWorkspaceId = kind === "ws" ? f.id : null;
     const p = f.properties || {};
     const rows = [];
+    if (p.feature_type) rows.push(["Feature type", p.feature_type.replaceAll("_", " ")]);
+    if (p.class_name) rows.push(["Cover class", p.class_name]);
+    if (p.functional_use) rows.push(["Functional use", p.functional_use]);
+    if (p.functional_use_suggestion) rows.push(["Use suggestion", p.functional_use_suggestion + " · candidate"]);
+    if (p.use_candidate) rows.push(["Use candidate model", p.use_candidate.model_id], ["Use candidate note", p.use_candidate.reason]);
+    if (p.functional_use_review) {
+      rows.push(["Use review", p.functional_use_review.status.replaceAll("_", " ")],
+        ["Use reviewer", p.functional_use_review.actor], ["Use source references", p.functional_use_review.evidence_refs.join("; ") || "none"]);
+    }
     let head;
     const flags = (p.flags || p.ai_flags || "").split(",").filter(Boolean);
     if (kind === "ai") {
       const L_ = manifest.layers[p.layer];
       head = `<div class="ins-head"><span class="badge ai">AI prediction</span><span class="ins-title">${esc(shortName(p.layer))}</span></div>`;
       rows.push(["Source model", `${p.layer} · ${L_.name}`], ["Feature ID", p.source_id], ["Area", `${p.area_m2} m² (${manifest.analysis_crs})`],
-        [L_.score_label[0].toUpperCase() + L_.score_label.slice(1), p.score ?? "n/a"], ["Editable", "No — add to workspace to review"]);
+        [L_.score_label || "Model score", p.score ?? "n/a"], ["Editable", "No — add to workspace to review"]);
     } else {
-      head = `<div class="ins-head"><span class="badge ${esc(p.review_status)}">${esc(p.review_status)}</span><span class="ins-title">Workspace footprint</span></div>`;
+      head = `<div class="ins-head"><span class="badge ${esc(p.review_status)}">${esc(p.review_status)}</span><span class="ins-title">Workspace feature</span></div>`;
       let area = null;
       try { area = turf.area(f); } catch (e) { area = null; }
       rows.push(["Provenance", ORIGIN_LABEL[p.origin] || p.origin]);
@@ -519,7 +613,25 @@
     }
     const cues = flags.length ? `<ul class="cues">${flags.map((x) => `<li><svg><use href="#i-warn"/></svg><span>${esc(FLAG_TEXT[x] || x)}</span></li>`).join("")}</ul><p class="help">Cues are display heuristics, not evaluated errors.</p>` : "";
     $("info").innerHTML = head + `<dl class="kv">${rows.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>` + cues;
+    const editable = !!workspace && kind === "ws" && selected.size === 1 && (p.feature_type || "building_footprint") === "building_footprint";
+    $("use-review").hidden = !editable;
+    if (editable) {
+      $("use-label").value = p.functional_use || "unknown";
+      $("use-evidence").value = p.functional_use_review?.status === "reviewed" ? p.functional_use_review.evidence_refs.join("\n") : "";
+    }
+    updateButtons();
   }
+
+  $("use-review").onsubmit = (e) => {
+    e.preventDefault();
+    if (!workspace || mode || saving || exporting) return;
+    const features = need(1);
+    if (!features || features.length !== 1) return;
+    return savedChange([[`features/${features[0].id}/functional-use`, {
+      functional_use: $("use-label").value.trim(),
+      evidence_refs: $("use-evidence").value.split("\n").map((ref) => ref.trim()).filter(Boolean),
+    }]], "Use review saved; accept the updated feature after checking it.");
+  };
 
   // ---------- counts ----------
   function inView(fc, map) {
@@ -535,7 +647,7 @@
       .concat(["suggested", "accepted", "rejected"].filter((s) => st[s]).map((s) => `<span class="pill ${s}">${st[s]} ${s}</span>`));
     if (human) pills.push(`<span class="pill human">${human} human-edited</span>`);
     if (!storageOk) pills.push(`<span class="pill warn">not saved locally — export before closing</span>`);
-    else if (ws.length) pills.push(`<span class="pill">autosaved in this browser</span>`);
+    else if (ws.length) pills.push(`<span class="pill">${workspace ? "saved on server · revision " + workspace.revision : "autosaved in this browser"}</span>`);
     if (dirty && ws.length) pills.push(`<span class="pill warn">unexported changes</span>`);
     $("ws-counts").innerHTML = pills.join("");
   }
@@ -578,11 +690,16 @@
     const isTest = split.startsWith("test");
     document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.split === split)));
     const banner = $("metric-banner");
+    if (!models.some((m) => m.metrics?.[split])) {
+      banner.textContent = "No evaluation is available for this site and split. Accuracy needs reviewed reference data.";
+      $("metric-cards").innerHTML = ""; $("metrics").innerHTML = ""; $("eval-notes").innerHTML = "";
+      return;
+    }
     banner.className = "banner " + (isTest ? "test" : "dev");
     banner.textContent = BANNER[split];
     const bar = (v) => `<div class="bar"><i style="width:${Math.max(0, Math.min(1, v || 0)) * 100}%"></i></div>`;
     $("metric-cards").innerHTML = models.map((m) => {
-      const b = m.metrics[split];
+      const b = m.metrics?.[split];
       if (!b) return `<div class="card"><div class="card-head"><span class="swatch" style="border-color:${m.color}"></span><span>${m.key} · ${esc(m.name)}</span></div><p class="small">Not available for this split.</p></div>`;
       const o = b.overall;
       return `<div class="card"><div class="card-head"><span class="swatch" style="border-color:${m.color}"></span><span>${m.key} · ${esc(m.name)}</span></div>
@@ -592,10 +709,11 @@
         <div class="metric"><span>Building recall</span><b>${fmt(o.building_recall)}</b>${bar(o.building_recall)}</div>
         <div class="foot">Matched <b>${o.matched}</b> of <b>${o.n_label}</b> buildings · TP/FP/FN <b>${o.matched}/${o.n_pred - o.matched}/${o.n_label - o.matched}</b></div></div>`;
     }).join("");
-    const wins = Object.keys((models[0].metrics[split] || {}).per_window || {});
+    const first = models.find((m) => m.metrics?.[split]).metrics[split];
+    const wins = Object.keys(first.per_window || {});
     $("metrics").innerHTML = `<tr><th>Per window (pixel IoU · buildings matched/labels)</th>${wins.map((w) => `<th>${esc(w.split("_")[0])}</th>`).join("")}</tr>` +
-      models.map((m) => { const b = m.metrics[split]; return `<tr><td>${m.key} · ${esc(m.name)}</td>${wins.map((w) => { const x = b && b.per_window[w]; return `<td>${x ? fmt(x.pixel_iou) + " · " + x.matched + "/" + x.n_label : "n/a"}</td>`; }).join("")}</tr>`; }).join("");
-    const s = models[0].metrics[split].settings;
+      models.map((m) => { const b = m.metrics?.[split]; return `<tr><td>${m.key} · ${esc(m.name)}</td>${wins.map((w) => { const x = b && b.per_window[w]; return `<td>${x ? fmt(x.pixel_iou) + " · " + x.matched + "/" + x.n_label : "n/a"}</td>`; }).join("")}</tr>`; }).join("");
+    const s = first.settings;
     $("eval-notes").innerHTML = [`Scoring: ${s.n_labels} reference buildings · ${s.eval_res_m} m grid · building match IoU ≥ ${s.match_iou} · pieces < ${s.min_piece_m2} m² dropped · identical settings for all models.`]
       .concat(manifest.evaluation_notes).map((n) => `<li>${esc(n)}</li>`).join("");
   }
@@ -609,8 +727,56 @@
   $("btn-toggle-eval").onclick = () => toggleEval();
   $("btn-close-eval").onclick = () => toggleEval(false);
 
+  // Fetch only the visible parts of the active layers, in bounded pages.
+  let viewportSeq = 0, viewportTimer = null;
+  function scheduleViewport() {
+    if (!api) return;
+    clearTimeout(viewportTimer); viewportTimer = setTimeout(loadViewport, 200);
+  }
+  async function loadViewport() {
+    if (!api) return;
+    const seq = ++viewportSeq, bounds = mapR.getBounds();
+    const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(",");
+    const active = new Set([document.querySelector('input[name="cmp"]:checked')?.value, $("review-candidate").value]);
+    active.delete(undefined); active.delete("");
+    try {
+      for (const key of active) {
+        const features = []; let page;
+        do {
+          page = await getJSON(`/api/sites/${api.site.id}/layers/${layerId(key)}/features?bbox=${encodeURIComponent(bbox)}&limit=500&offset=${features.length}`);
+          if (seq !== viewportSeq) return;
+          features.push(...page.features.map((f) => ({ ...f, properties: { ...f.properties, layer: key } })));
+        } while (page.numberReturned && features.length < page.numberMatched && features.length < 5000);
+        layersData[key] = { type: "FeatureCollection", features };
+        if (page.numberMatched > features.length) status("Showing the first 5,000 visible features; zoom in to review a smaller area.", "warn");
+      }
+      if (seq === viewportSeq && !mode) { renderLeft(); renderRightCandidate(); updateCounts(); }
+    } catch (e) { if (seq === viewportSeq) status("Layer loading failed: " + e.message, "error"); }
+  }
+  mapR.on("moveend", scheduleViewport);
+  $("btn-next-review").onclick = async () => {
+    if (!workspace || mode || saving) return;
+    try {
+      const q = await getJSON("/api/review/queue?site_id=" + api.site.id);
+      const f = q.features.find((x) => !selected.has(x.id)) || q.features[0];
+      if (!f) return status("No suggested features remain.");
+      selected = new Set([f.id]); reviewStarted = Date.now(); renderWorkspace(false); showInfo(f, "ws");
+      mapR.fitBounds(L.geoJSON(f).getBounds().pad(0.4));
+    } catch (e) { status("Review queue failed: " + e.message, "error"); }
+  };
+  $("btn-history").onclick = async () => {
+    if (!workspace) return;
+    try {
+      const h = await getJSON("/api/review/history?site_id=" + api.site.id + "&limit=20");
+      const list = $("review-history"); list.hidden = false;
+      list.innerHTML = h.events.map((e) => `<li>Revision ${e.revision} · ${esc(e.operation || "change")} · ${esc(e.actor || "local-reviewer")} · ${esc(e.timestamp)}${e.reason ? " · " + esc(e.reason) : ""}</li>`).join("") || "<li>No saved changes yet.</li>";
+    } catch (e) { status("History failed: " + e.message, "error"); }
+  };
+
   // ---------- start ----------
   renderLeft(); renderRightCandidate(); renderWorkspace(false); renderMetrics(); clearInfo();
+  await loadViewport();
   status(`Loaded ${keys.map((k) => k + "=" + manifest.layers[k].count).join(", ")} · workspace ${ws.length}`);
-  window.__app = { mapL, mapR, get ws() { return ws; }, toggleEval, get api() { return api; }, renderTopology, get lastEdgeFlash() { return lastEdgeFlash; } };  // for automated checks
+  window.__app = { mapL, mapR, get ws() { return ws; }, get revision() { return workspace?.revision; }, get saving() { return saving; }, toggleEval, get api() { return api; }, renderTopology, get lastEdgeFlash() { return lastEdgeFlash; } };  // for automated checks
+  if (api) window.dispatchEvent(new CustomEvent("site-ready", { detail: api.site }));
 })();

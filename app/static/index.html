@@ -33,7 +33,7 @@
     <svg class="brand-mark"><use href="#i-mark"/></svg>
     <div class="brand-text">
       <span class="brand-name">FOOTPRINT INTELLIGENCE</span>
-      <span class="brand-sub" id="hdr-context">La Paz, Bolivia · drone orthophoto</span>
+      <span class="brand-sub" id="hdr-context">Loading site…</span>
     </div>
   </div>
   <div class="appbar-mid">
@@ -49,6 +49,49 @@
 
 <main class="shell">
   <aside id="panel" class="sidebar" aria-label="Project and review controls">
+
+    <details class="section" id="site-controls" open hidden>
+      <summary><span>Site</span><svg class="chev"><use href="#i-chev"/></svg></summary>
+      <label class="field-label" for="site-select">Active site</label>
+      <div class="select-wrap"><select id="site-select"></select></div>
+      <details id="site-import">
+        <summary>Add a site</summary>
+        <form id="site-form" class="site-form">
+          <label>Site ID<input name="site_id" required pattern="[A-Za-z0-9_-]{1,60}" placeholder="pilot-01" maxlength="60"></label>
+          <label>Name<input name="name" required maxlength="120" placeholder="Pilot area"></label>
+          <label>RGB GeoTIFF<input name="imagery" type="file" accept=".tif,.tiff" required></label>
+          <label>Analysis CRS (metres)<input name="analysis_crs" placeholder="EPSG:32643"></label>
+          <label>Source licence<input name="licence" value="unknown" maxlength="150"></label>
+          <label>Source URL<input name="source_url" type="url" maxlength="1000"></label>
+          <label>DSM (optional)<input name="dsm" type="file" accept=".tif,.tiff"></label>
+          <label>DTM (optional)<input name="dtm" type="file" accept=".tif,.tiff"></label>
+          <label>Vertical datum (optional)<input name="vertical_datum" maxlength="200"></label>
+          <button class="btn primary" id="site-submit" type="submit">Import site</button>
+        </form>
+      </details>
+      <p class="small" id="site-result" role="status" aria-live="polite"></p>
+    </details>
+
+    <details class="section" id="job-controls" hidden>
+      <summary><span>Extraction jobs</span><svg class="chev"><use href="#i-chev"/></svg></summary>
+      <div class="site-form">
+        <label>Local model<select id="job-model"></select></label>
+        <label>Resolution (m/pixel)<input id="job-resolution" type="number" min="0.05" max="2" step="0.05" value="0.3"></label>
+        <label>Minimum area (m²)<input id="job-area" type="number" min="0" max="1000" value="10"></label>
+        <button class="btn primary" id="job-run">Run extraction</button>
+        <label>Functional-use candidate<select id="use-model"></select></label>
+        <label>Building input layer<select id="use-buildings"></select></label>
+        <label>Road surface input layer<select id="use-roads"></select></label>
+        <button class="btn" id="job-run-use">Generate use suggestions</button>
+        <p class="help">Suggestions keep use unknown until a reviewer records supporting references.</p>
+        <label>Import prediction GeoJSON<input id="job-file" type="file" accept=".json,.geojson"></label>
+        <label>Input CRS<input id="job-crs" value="EPSG:4326"></label>
+        <label>Feature type<select id="job-type"><option value="building_footprint">Building footprints</option><option value="road_surface">Road surfaces</option><option value="land_cover">Land cover</option></select></label>
+        <button class="btn" id="job-import">Import prediction layer</button>
+      </div>
+      <p class="small" id="job-note" role="status" aria-live="polite">Model candidates need local checkpoints and reference evaluation.</p>
+      <div id="job-list"></div>
+    </details>
 
     <details class="section" open>
       <summary><span>Project</span><svg class="chev"><use href="#i-chev"/></svg></summary>
@@ -84,6 +127,13 @@
 
       <div class="step"><span class="step-n">3</span><div class="step-body">
         <span class="field-label">Review selection <span class="sel-count" id="sel-count">0 selected</span></span>
+        <div class="site-form" id="review-context" hidden>
+          <label>Reviewer label<input id="review-actor" value="local-reviewer" maxlength="80"></label>
+          <label>Reason (optional)<input id="review-reason" maxlength="500" placeholder="Reason for this change"></label>
+          <div class="btn-row"><button class="btn" id="btn-next-review">Next suggested</button><button class="btn" id="btn-history">History</button></div>
+          <p class="small" id="review-revision" aria-live="polite"></p>
+          <ol class="notes small" id="review-history" hidden></ol>
+        </div>
         <div class="btn-row seg">
           <button class="btn ok" id="btn-accept" title="Mark selected as accepted (A)"><svg><use href="#i-check"/></svg>Accept</button>
           <button class="btn warn" id="btn-reject" title="Mark selected as rejected (R)"><svg><use href="#i-x"/></svg>Reject</button>
@@ -95,6 +145,10 @@
           <button class="btn" id="btn-merge" title="Merge two or more selected polygons (Shift+click to multi-select)"><svg><use href="#i-merge"/></svg>Merge</button>
           <button class="btn" id="btn-split" title="Split one selected polygon by drawing a line across it"><svg><use href="#i-split"/></svg>Split</button>
         </div>
+        <div class="site-form" id="draw-context" hidden>
+          <label>Feature to draw<select id="draw-type"><option value="building_footprint">Building footprint</option><option value="road_surface">Road surface</option><option value="land_cover">Land cover</option></select></label>
+          <label>Cover class (for land cover)<input id="draw-class" maxlength="80" placeholder="tree, water, bare soil…"></label>
+        </div>
         <div class="btn-row danger-row">
           <button class="btn danger" id="btn-remove" title="Remove selected copies from the workspace (AI layers unchanged)"><svg><use href="#i-trash"/></svg>Remove from workspace</button>
         </div>
@@ -104,13 +158,14 @@
 
       <div class="step"><span class="step-n">4</span><div class="step-body">
         <span class="field-label">Export reviewed footprints</span>
+        <label class="site-form" id="export-revision-field" hidden>Saved revision<input id="export-revision" type="number" min="0" step="1" data-auto="true"></label>
         <div class="checks">
           <label class="check"><input type="checkbox" class="exp-status" value="accepted" checked>Accepted</label>
           <label class="check"><input type="checkbox" class="exp-status" value="suggested">Suggested</label>
           <label class="check"><input type="checkbox" class="exp-status" value="rejected">Rejected</label>
         </div>
         <div class="btn-row">
-          <button class="btn primary" id="btn-export"><svg><use href="#i-export"/></svg>Export EPSG:32719 + WGS84</button>
+          <button class="btn primary" id="btn-export"><svg><use href="#i-export"/></svg>Export saved revision</button>
           <button class="btn" id="btn-download" title="Save a WGS84 GeoJSON copy locally without the server">Download WGS84</button>
         </div>
         <div id="export-result" class="result" role="status" aria-live="polite"></div>
@@ -120,6 +175,12 @@
     <details class="section" open>
       <summary><span>Selected footprint</span><svg class="chev"><use href="#i-chev"/></svg></summary>
       <div id="info" class="inspector"><p class="empty">Nothing selected. Click a polygon on either map.</p></div>
+      <form id="use-review" class="site-form" hidden>
+        <label>Functional use<input id="use-label" maxlength="80" required value="unknown" placeholder="Reviewed local class or unknown"></label>
+        <label>Source references<textarea id="use-evidence" rows="3" placeholder="One reviewed record or observation reference per line"></textarea></label>
+        <p class="help">A known use needs source references. This records a reviewer assertion; use unknown when unsupported. Save, then accept the updated feature.</p>
+        <button class="btn" id="btn-use-save" type="submit">Save use review</button>
+      </form>
     </details>
 
     <details class="section">
@@ -176,6 +237,9 @@
 <script src="/static/vendor/leaflet-geoman.min.js"></script>
 <script src="/static/vendor/turf.min.js"></script>
 <script src="/static/edit_ops.js"></script>
+<script src="/static/sites.js"></script>
+<script src="/static/workspace_client.js"></script>
+<script src="/static/jobs.js"></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

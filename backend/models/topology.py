@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class ValidateRequest(BaseModel):
+    site_id: str | None = None
     features: dict = Field(description="GeoJSON FeatureCollection (EPSG:4326 unless crs is given); feature `id` is used as the feature id")
     crs: str = "EPSG:4326"
 

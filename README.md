@@ -21,6 +21,8 @@ them. This prototype covers the first step: detecting building footprints, measu
 models are on real drone imagery, and giving a reviewer tools to accept, correct or reject each footprint
 before export.
 
+**New local workflow:** start the FastAPI application without a dataset, import multiple sites, run local extraction jobs and save review revisions. [Setup and commands](docs/LOCAL_WORKFLOW.md) · [Phases 1–3 software progress](docs/SOFTWARE_PROGRESS.md). Model training and pilot accuracy validation still require reviewed local data and checkpoints.
+
 ## 2. Features
 
 - **Inference (CPU)** with three pretrained models on a georeferenced GeoTIFF:
@@ -233,6 +235,9 @@ Frozen artifacts are listed in `outputs/phase3/frozen_hashes.sha256`. Protocol f
 `outputs/phase3/protocol_lock*.sha256`.
 
 ## 13. Future work
+
+The [five-phase development roadmap](docs/ROADMAP.md) connects the existing prototype to the full SIH26012
+scope, with implementation tasks, dependencies and completion gates for each remaining phase.
 
 - Fine-tune an instance- or boundary-aware model on locally reviewed roofs, and evaluate it on new held-out
   windows (ideally from different imagery).

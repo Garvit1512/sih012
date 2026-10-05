@@ -1,0 +1,14 @@
+# Lightweight ingestion/review runtime; model training uses requirements.txt as well.
+fastapi==0.142.2
+uvicorn==0.54.0
+httpx==0.28.1
+pydantic==2.13.5
+rasterio==1.5.2
+geopandas==1.2.0
+shapely==2.1.2
+pyproj==3.8.0
+numpy==2.5.3
+scipy==1.18.1
+pillow==12.3.0
+python-multipart==0.0.32
+pytest==9.1.1

@@ -8,6 +8,8 @@ Outputs are building footprints, not legal cadastral parcel boundaries.
 """
 
 import mimetypes
+import threading
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,9 +18,10 @@ from fastapi.staticfiles import StaticFiles
 
 from . import errors
 from .config import Settings
-from .routers import export, layers, review, sites, topology
+from .routers import export, jobs, layers, review, sites, topology
+from .services.job_service import JobManager
 from .services.review_service import WorkspaceStore
-from .services.site_service import Catalog
+from .services.site_service import SiteRegistry
 
 mimetypes.add_type("application/geo+json", ".geojson")
 mimetypes.add_type("text/javascript", ".js")
@@ -34,20 +37,40 @@ Geospatial backend for **site → orthophoto → AI layer → feature review →
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
-    app = FastAPI(title="SIH Building Footprint Backend", version="0.1.0", description=DESCRIPTION)
+    @asynccontextmanager
+    async def lifespan(app):
+        app.state.jobs.start()
+        try: yield
+        finally: app.state.jobs.close()
+
+    app = FastAPI(title="SIH Building Footprint Backend", version="0.2.0", description=DESCRIPTION, lifespan=lifespan)
     errors.install(app)
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["GET", "POST"],
                        allow_headers=["Content-Type"])
-    catalog = Catalog(settings)
+    catalog = SiteRegistry(settings)
     app.state.settings, app.state.catalog = settings, catalog
-    app.state.workspace = WorkspaceStore(settings.workspace_dir, catalog.layers, catalog.bounds()[0] if catalog.ready else None, catalog.site_id)
+    app.state.jobs = JobManager(settings, catalog)
+    workspaces = {}
+    workspace_lock = threading.Lock()
+
+    def workspace_for(site_id):
+        cat = catalog.get(site_id)
+        with workspace_lock:
+            if site_id not in workspaces:
+                workspaces[site_id] = WorkspaceStore(settings.workspace_dir, cat.layers, cat.bounds()[0], site_id,
+                                                     cat.analysis_crs, cat.manifest.get("schema_version", 1) >= 2)
+            workspaces[site_id].layers = cat.layers
+            return workspaces[site_id]
+
+    app.state.workspace_for = workspace_for
 
     @app.get("/api/health", tags=["health"], summary="Health check")
     def health(request: Request) -> dict:
         c = request.app.state.catalog
-        return {"ok": True, "backend": "fastapi", "data_ready": c.ready, "site_id": c.site_id}
+        return {"ok": True, "backend": "fastapi", "data_ready": c.ready, "site_id": c.site_id,
+                "site_count": len(c.all()), "storage_mode": "single-process local writer"}
 
-    for r in (sites.router, layers.router, topology.router, review.router, export.router):
+    for r in (sites.router, layers.router, topology.router, review.router, export.router, jobs.router):
         app.include_router(r)
 
     # Existing single-page UI + display data bundle (read-only, StaticFiles blocks path traversal).

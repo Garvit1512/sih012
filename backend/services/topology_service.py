@@ -22,11 +22,12 @@ from ..utils.geometry import polygonal
 class TopoFeat:
     id: str
     utm: object          # shapely geometry in EPSG:32719
+    feature_type: str = "building_footprint"
 
 
-def tolerances(shared_tol: float | None = None) -> dict:
+def tolerances(shared_tol: float | None = None, analysis_crs: str = C.ANALYSIS_CRS) -> dict:
     return {
-        "crs": C.ANALYSIS_CRS, "units": "metres / square metres",
+        "crs": analysis_crs, "units": "metres / square metres",
         "overlap_min_area_m2": C.OVERLAP_MIN_AREA_M2, "overlap_min_fraction_of_smaller": C.OVERLAP_MIN_FRACTION,
         "overlap_error_fraction_of_smaller": C.OVERLAP_ERROR_FRACTION, "duplicate_iou": C.DUPLICATE_IOU,
         "shared_boundary_tolerance_m": shared_tol or C.SHARED_BOUNDARY_TOL_M,
@@ -54,6 +55,8 @@ def shared_runs(a, b, tol: float):
 
 def pair_relation(a: TopoFeat, b: TopoFeat, tol: float = C.SHARED_BOUNDARY_TOL_M):
     """Classify the relationship of two valid footprints: duplicate | overlap | shared_boundary | None."""
+    if a.feature_type != b.feature_type:
+        return None
     inter = a.utm.intersection(b.utm)
     ia = inter.area
     smaller = min(a.utm.area, b.utm.area)
@@ -77,7 +80,7 @@ def _invalid_point(g):
     return Point(float(m.group(1)), float(m.group(2))) if m else g.representative_point()
 
 
-def analyze(feats: list[TopoFeat], tol: float = C.SHARED_BOUNDARY_TOL_M) -> dict:
+def analyze(feats: list[TopoFeat], tol: float = C.SHARED_BOUNDARY_TOL_M, analysis_crs: str = C.ANALYSIS_CRS) -> dict:
     conflicts, rels = [], []
     valid = [f for f in feats if f.utm.is_valid and not f.utm.is_empty]
     for f in feats:
@@ -105,14 +108,17 @@ def analyze(feats: list[TopoFeat], tol: float = C.SHARED_BOUNDARY_TOL_M) -> dict
                                   "metrics": {"overlap_area_m2": r["area_m2"], "fraction_of_smaller": r["fraction_of_smaller"]}})
             else:
                 rels.append({"type": "shared_boundary", "features": ids, "length_m": r["length_m"],
-                             "geometry": mapping(to_wgs(unary_union(r["runs"])))})
-        conflicts += _gaps(valid, tree)
+                             "geometry": mapping(to_wgs(unary_union(r["runs"]), analysis_crs))})
+        for kind in sorted({f.feature_type for f in valid}):
+            group = [f for f in valid if f.feature_type == kind]
+            if len(group) > 1:
+                conflicts += _gaps(group, STRtree([f.utm for f in group]))
     order = {"invalid_geometry": 0, "duplicate": 1, "overlap": 2, "gap_sliver": 3}
     conflicts.sort(key=lambda c: (order[c["type"]], c["features"]))
     out = []
     for n, c in enumerate(conflicts, 1):
         g = c.pop("geom")
-        out.append({"id": f"conflict-{n:03d}", **c, "geometry": mapping(to_wgs(g)) if g is not None and not g.is_empty else None})
+        out.append({"id": f"conflict-{n:03d}", **c, "geometry": mapping(to_wgs(g, analysis_crs)) if g is not None and not g.is_empty else None})
     rels.sort(key=lambda r: r["features"])
     by_type: dict = {}
     for c in out:
@@ -121,7 +127,7 @@ def analyze(feats: list[TopoFeat], tol: float = C.SHARED_BOUNDARY_TOL_M) -> dict
             "summary": {"feature_count": len(feats), "conflict_count": len(out), "by_type": by_type,
                         "by_severity": {s: sum(c["severity"] == s for c in out) for s in ("warning", "error")},
                         "shared_boundary_count": len(rels)},
-            "tolerances": tolerances(tol)}
+            "tolerances": tolerances(tol, analysis_crs)}
 
 
 def _gaps(valid: list[TopoFeat], tree: STRtree) -> list[dict]:
@@ -144,7 +150,7 @@ def _gaps(valid: list[TopoFeat], tree: STRtree) -> list[dict]:
     return found
 
 
-def shared_boundary(target: TopoFeat, others: list[TopoFeat], vertex_utm: Point, tol: float) -> dict:
+def shared_boundary(target: TopoFeat, others: list[TopoFeat], vertex_utm: Point, tol: float, analysis_crs: str = C.ANALYSIS_CRS) -> dict:
     """Which neighbour shares the edge the user is dragging, and which of its edge to flash.
 
     The neighbour must have its boundary within `tol` of the dragged vertex and share a boundary run of at
@@ -153,7 +159,7 @@ def shared_boundary(target: TopoFeat, others: list[TopoFeat], vertex_utm: Point,
     """
     cands = []
     for o in others:
-        if o.id == target.id or not o.utm.is_valid or o.utm.is_empty:
+        if o.id == target.id or o.feature_type != target.feature_type or not o.utm.is_valid or o.utm.is_empty:
             continue
         d = o.utm.boundary.distance(vertex_utm)
         if d > tol:
@@ -162,7 +168,7 @@ def shared_boundary(target: TopoFeat, others: list[TopoFeat], vertex_utm: Point,
         length = sum(r.length for r in runs)
         if length >= C.SHARED_BOUNDARY_MIN_LEN_M:
             cands.append((d, o, runs, length))
-    base = {"tolerance_m": tol, "tolerances": tolerances(tol)}
+    base = {"tolerance_m": tol, "tolerances": tolerances(tol, analysis_crs)}
     if not cands:
         return {"shared": False, "neighbor_feature_id": None, "edge": None, "distance_m": None, "shared_length_m": None,
                 "neighbors": [], **base}
@@ -171,6 +177,5 @@ def shared_boundary(target: TopoFeat, others: list[TopoFeat], vertex_utm: Point,
     run = min(runs, key=lambda r: r.distance(vertex_utm))
     # Trim the run to the part of the neighbour's boundary within tol of the vertex's local edge? Keep the whole
     # contiguous shared run: it is the edge the two footprints visibly share.
-    return {"shared": True, "neighbor_feature_id": o.id, "edge": mapping(to_wgs(run)), "distance_m": round(d, 4),
+    return {"shared": True, "neighbor_feature_id": o.id, "edge": mapping(to_wgs(run, analysis_crs)), "distance_m": round(d, 4),
             "shared_length_m": round(length, 3), "neighbors": [c[1].id for c in cands], **base}
-

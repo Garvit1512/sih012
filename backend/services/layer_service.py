@@ -58,7 +58,7 @@ class LayerStore:
 
     def resolve(self, layer_id: str) -> str:
         for k in self.keys():
-            if layer_id in (k, LAYER_META.get(k, {}).get("id", k.lower())):
+            if layer_id in (k, self._manifest["layers"][k].get("id", LAYER_META.get(k, {}).get("id", k.lower()))):
                 return k
         raise ApiError("LAYER_NOT_FOUND", f"Unknown layer {layer_id!r}.", 404)
 
@@ -71,7 +71,7 @@ class LayerStore:
 
     def _load(self, key: str) -> LayerData:
         m = self._manifest["layers"][key]
-        lid = LAYER_META.get(key, {}).get("id", key.lower())
+        lid = m.get("id", LAYER_META.get(key, {}).get("id", key.lower()))
         path = (self._dir / m["file"]).resolve()          # file name comes from the manifest, never from a client
         if self._dir.resolve() not in path.parents or not path.is_file():
             raise ApiError("LAYER_DATA_MISSING", f"Layer data for {lid} is not available.", 503)
@@ -80,7 +80,7 @@ class LayerStore:
         for f in fc["features"]:
             p = dict(f["properties"])
             g = shape(f["geometry"])
-            u = to_utm(g)
+            u = to_utm(g, analysis_crs=self._manifest["analysis_crs"])
             feats.append(AiFeature(f"{lid}:{p['source_id']}", int(p["source_id"]), p, g, u, float(u.area)))
         ld = LayerData(key, lid, m, feats)
         ld.by_id = {f.id: f for f in feats}

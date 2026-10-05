@@ -13,6 +13,8 @@ class ImageryInfo(BaseModel):
     native_resolution_m: float | None
     source_sha256: str | None
     note: str | None = None
+    tile_url: str | None = None
+    quality: dict = {}
 
 
 class SiteSummary(BaseModel):

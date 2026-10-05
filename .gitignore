@@ -62,3 +62,7 @@ outputs/app_exports/
 
 # ---- FastAPI backend: server-side review workspace ----
 outputs/backend_workspace/
+outputs/sites/
+outputs/jobs/
+outputs/experiments/
+outputs/datasets/

@@ -6,7 +6,7 @@ from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from shapely.ops import unary_union
 from shapely.validation import explain_validity, make_valid
 
-from ..config import COORD_PAD_DEG, REPAIR_MAX_AREA_CHANGE, WGS84
+from ..config import ANALYSIS_CRS, COORD_PAD_DEG, REPAIR_MAX_AREA_CHANGE, WGS84
 from ..errors import ApiError
 from .crs import normalise_crs, to_utm, to_wgs
 
@@ -25,14 +25,14 @@ class Checked:
     repairs: list = field(default_factory=list)
 
 
-def check_polygon(geojson_geom: dict, crs: str | None = None, site_bounds: tuple | None = None, label: str = "geometry") -> Checked:
+def check_polygon(geojson_geom: dict, crs: str | None = None, site_bounds: tuple | None = None, label: str = "geometry", analysis_crs: str = ANALYSIS_CRS) -> Checked:
     """Validate a client polygon; return it in WGS84.
 
     Rejects: unreadable/non-polygon/empty geometry, unsupported CRS, coordinates outside the plausible range
     (or far outside the site), and invalid geometry that cannot be repaired within REPAIR_MAX_AREA_CHANGE.
     A safe repair is applied and recorded in `repairs`; a material repair is rejected, never applied silently.
     """
-    src = normalise_crs(crs)
+    src = normalise_crs(crs, analysis_crs)
     try:
         g = shape(geojson_geom)
     except Exception:  # noqa: BLE001
@@ -46,7 +46,7 @@ def check_polygon(geojson_geom: dict, crs: str | None = None, site_bounds: tuple
         raise ApiError("COORDINATES_OUT_OF_RANGE", f"{label}: non-finite coordinates.", 422)
     if src == WGS84 and not (-180 <= minx and maxx <= 180 and -90 <= miny and maxy <= 90):
         raise ApiError("COORDINATES_OUT_OF_RANGE", f"{label}: coordinates are not valid longitude/latitude (EPSG:4326).", 422)
-    if src != WGS84 and not (0 <= minx and maxx <= 1_000_000 and 0 <= miny and maxy <= 10_000_000):
+    if src == "EPSG:32719" and not (0 <= minx and maxx <= 1_000_000 and 0 <= miny and maxy <= 10_000_000):
         raise ApiError("COORDINATES_OUT_OF_RANGE", f"{label}: coordinates are outside the valid UTM range.", 422)
     repairs = []
     if not g.is_valid:

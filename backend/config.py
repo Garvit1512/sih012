@@ -39,9 +39,18 @@ class Settings:
     export_root: Path = field(default_factory=lambda: Path(os.environ.get("SIH_EXPORT_ROOT", ROOT / "outputs" / "app_exports")))
     workspace_dir: Path = field(default_factory=lambda: Path(os.environ.get("SIH_WORKSPACE_DIR", ROOT / "outputs" / "backend_workspace")))
     static_dir: Path = ROOT / "app" / "static"
+    sites_dir: Path | None = None
+    jobs_dir: Path | None = None
+    models_dir: Path = field(default_factory=lambda: Path(os.environ.get("SIH_MODELS_DIR", ROOT / "models")))
     # The UI is normally served by this same backend (same origin, no CORS needed). These origins cover a
     # separately-served frontend during development.
     cors_origins: list[str] = field(default_factory=lambda: _csv(
         "SIH_CORS_ORIGINS",
         "http://127.0.0.1:8765,http://localhost:8765,http://127.0.0.1:8000,http://localhost:8000,"
         "http://127.0.0.1:5173,http://localhost:5173"))
+
+    def __post_init__(self):
+        # Explicit test/data roots remain isolated from the application's local sites.
+        local_root = self.workspace_dir.parent
+        self.sites_dir = self.sites_dir or Path(os.environ.get("SIH_SITES_DIR", local_root / "sites"))
+        self.jobs_dir = self.jobs_dir or Path(os.environ.get("SIH_JOBS_DIR", local_root / "jobs"))
